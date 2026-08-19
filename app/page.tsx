@@ -94,26 +94,19 @@ export default function NotebookPortfolio() {
       `}} />
 
       {/* --- RANDOM BACKGROUND DOODLES --- */}
-      {/* Top Right Swirl */}
       <svg className="absolute top-24 right-4 md:right-32 w-24 h-24 text-gray-300 pointer-events-none transform rotate-12" viewBox="0 0 100 100">
         <path d="M 20 50 C 20 20 80 20 80 50 C 80 80 40 80 40 60 C 40 40 60 40 60 55 C 60 70 50 70 50 65" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/>
       </svg>
-      
-      {/* Mid Left Scribble */}
       <svg className="absolute top-[35%] left-2 md:left-12 w-16 h-16 text-gray-300 pointer-events-none transform -rotate-12" viewBox="0 0 100 100">
         <path d="M 10 30 Q 30 10 50 30 T 90 30 M 15 50 Q 40 30 60 50 T 85 50 M 20 70 Q 50 50 70 70" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/>
       </svg>
-
-      {/* Bottom Right Stars */}
       <svg className="absolute top-[65%] right-10 w-16 h-16 text-yellow-400/60 pointer-events-none" viewBox="0 0 100 100">
         <path d="M 50 10 L 55 45 L 90 50 L 55 55 L 50 90 L 45 55 L 10 50 L 45 45 Z" fill="currentColor"/>
         <path d="M 20 20 L 25 35 L 40 40 L 25 45 L 20 60 L 15 45 L 0 40 L 15 35 Z" fill="currentColor" transform="scale(0.5) translate(120, -50)"/>
       </svg>
-      {/* --------------------------------- */}
 
       {/* 1. HEADER */}
       <header className="pt-8 px-6 md:px-12 w-full max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 pb-6 mb-8 relative z-10">
-        
         <div className="relative inline-block transform -rotate-2">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight">
             Hi, I'm sky!
@@ -132,7 +125,6 @@ export default function NotebookPortfolio() {
             <span className="text-2xl font-bold transform -rotate-1">Projects</span>
             <OrangeUnderline className="-bottom-1" delay="0.9s" />
           </a>
-
           <a href="#contact" className="flex flex-col items-center relative group cursor-pointer hover:-translate-y-1 transition-transform">
             <svg className="w-8 h-8 md:w-10 md:h-10 text-gray-900 mb-1" viewBox="0 0 100 100">
               <path className="live-draw" style={{animationDelay: '0.6s'}} pathLength="100" d="M 10 60 L 90 20 L 60 90 L 50 65 Z M 90 20 L 50 65 M 40 60 L 50 65 L 45 85 Z" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
@@ -140,7 +132,6 @@ export default function NotebookPortfolio() {
             <span className="text-2xl font-bold transform -rotate-1">Contact</span>
             <OrangeUnderline className="-bottom-1" delay="1.1s" />
           </a>
-
           <a href="#testimonials" className="flex flex-col items-center relative group cursor-pointer hover:-translate-y-1 transition-transform">
             <svg className="w-8 h-8 md:w-10 md:h-10 text-gray-900 mb-1" viewBox="0 0 100 100">
               <path className="live-draw" style={{animationDelay: '0.8s'}} pathLength="100" d="M 20 30 L 70 30 L 70 70 L 40 70 L 20 90 L 20 70 L 20 30 Z" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
@@ -170,34 +161,26 @@ export default function NotebookPortfolio() {
               </div>
             </div>
             
-            {/* Professional, Industry Standard Copy */}
             <p className="text-2xl md:text-[1.65rem] text-gray-800 leading-[1.6] mt-6">
               I architect and build high-performance, scalable software from the ground up. I bridge the gap between complex backend logic and seamless frontend user experiences, delivering MVPs that are production-ready on day one.
             </p>
 
-            {/* Technical Skills Display */}
             <div className="mt-8 relative">
               <h3 className="text-xl font-bold text-gray-500 transform -rotate-1 mb-3">My Stack:</h3>
               <div className="flex flex-wrap gap-3">
-                {/* Updated skills array to include Server Integration & Prompt Engineering */}
                 {['Kotlin / Compose', 'Server Integration', 'WebSockets', 'Prompt Engineering', 'Next.js', 'Node.js', 'Upstash Redis', 'Python RAG / AI'].map((skill, index) => (
                   <span key={skill} className={`px-4 py-1 border-2 border-gray-800 rounded-lg text-xl font-bold bg-white/50 shadow-sm transition-transform hover:-translate-y-1 ${index % 2 === 0 ? 'transform rotate-1' : 'transform -rotate-1'}`}>
                     {skill}
                   </span>
                 ))}
               </div>
-              
-              {/* Hand-drawn arrow pointing to skills */}
               <svg className="absolute -right-8 bottom-0 w-12 h-12 text-red-500 pointer-events-none transform rotate-45 hidden md:block" viewBox="0 0 100 100">
                 <path d="M 20 80 Q 50 20 90 20 M 70 10 L 90 20 L 80 40" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
           </div>
 
-          {/* TIC-TAC-TOE GAME */}
           <div className="w-full md:w-[45%] flex flex-col justify-center items-center relative">
-            
-            {/* Fun hand-drawn arrow pointing to game */}
             <svg className="absolute -top-12 left-10 w-16 h-16 text-blue-500 pointer-events-none transform -rotate-12 hidden md:block" viewBox="0 0 100 100">
               <path d="M 10 90 Q 30 10 90 50 M 70 35 L 90 50 L 75 70" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
@@ -246,24 +229,38 @@ export default function NotebookPortfolio() {
             <OrangeUnderline className="-bottom-1" delay="0s" />
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
+            
+            {/* Project 1: Cnoize */}
             <div className="relative bg-white p-4 pb-12 border border-gray-200 shadow-[8px_8px_0_0_rgba(0,0,0,0.8)] transform rotate-1 transition-transform hover:-rotate-1">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-yellow-200/80 transform -rotate-2 border border-yellow-300"></div>
               <div className="aspect-video bg-gray-900 rounded-sm mb-4 flex items-center justify-center text-white border-2 border-black">
-                <span className="font-mono text-sm opacity-50">CNOIZE_TRADING_ENGINE_UI</span>
+                <span className="font-mono text-xs md:text-sm opacity-50">CNOIZE_TRADING_ENGINE_UI</span>
               </div>
               <h3 className="text-3xl font-bold mb-2">Cnoize Trading App</h3>
               <p className="text-xl text-gray-700 leading-tight">Kotlin/Jetpack Compose UI powered by real-time WebSockets and Upstash Redis.</p>
             </div>
 
+            {/* Project 2: Agentic Workflow */}
             <div className="relative bg-white p-4 pb-12 border border-gray-200 shadow-[8px_8px_0_0_rgba(0,0,0,0.8)] transform -rotate-2 transition-transform hover:rotate-1">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-yellow-200/80 transform rotate-3 border border-yellow-300"></div>
               <div className="aspect-video bg-blue-900 rounded-sm mb-4 flex items-center justify-center text-white border-2 border-black">
-                <span className="font-mono text-sm opacity-50">AI_RAG_PIPELINE_SYS</span>
+                <span className="font-mono text-xs md:text-sm opacity-50">AI_RAG_PIPELINE_SYS</span>
               </div>
               <h3 className="text-3xl font-bold mb-2">Agentic Workflow</h3>
               <p className="text-xl text-gray-700 leading-tight">Zero-hallucination data extraction tool using custom Python LLM orchestration.</p>
             </div>
+
+            {/* Project 3: Native Storefront */}
+            <div className="relative bg-white p-4 pb-12 border border-gray-200 shadow-[8px_8px_0_0_rgba(0,0,0,0.8)] transform rotate-2 transition-transform hover:-rotate-1">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-red-200/80 transform -rotate-1 border border-red-300"></div>
+              <div className="aspect-video bg-emerald-900 rounded-sm mb-4 flex items-center justify-center text-white border-2 border-black">
+                <span className="font-mono text-xs md:text-sm opacity-50">REACT_NATIVE_STOREFRONT</span>
+              </div>
+              <h3 className="text-3xl font-bold mb-2">Mobile Storefront</h3>
+              <p className="text-xl text-gray-700 leading-tight">Cross-platform e-commerce app built in a React Native environment. Optimized for native-like performance and scalability.</p>
+            </div>
+
           </div>
         </section>
 
@@ -312,10 +309,8 @@ export default function NotebookPortfolio() {
           </div>
         </section>
 
-        {/* 6. CONTACT SECTION (With Coffee Doodle) */}
+        {/* 6. CONTACT SECTION */}
         <section id="contact" className="pt-10 pb-20 scroll-mt-24 flex flex-col items-center text-center relative">
-          
-          {/* Coffee Cup Doodle */}
           <svg className="absolute -top-4 right-10 md:right-40 w-16 h-16 text-gray-400 pointer-events-none transform rotate-12 hidden md:block" viewBox="0 0 100 100">
             <path d="M 20 30 L 70 30 L 65 70 C 65 80 25 80 25 70 Z M 70 40 C 85 40 85 60 70 60 M 35 15 C 35 5 45 25 45 15 M 55 15 C 55 5 65 25 65 15" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
