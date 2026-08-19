@@ -111,7 +111,7 @@ export default function NotebookPortfolio() {
       </svg>
       {/* --------------------------------- */}
 
-      {/* 1. HEADER (REMOVED BOTTOM BORDER) */}
+      {/* 1. HEADER */}
       <header className="pt-8 px-6 md:px-12 w-full max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 pb-6 mb-8 relative z-10">
         
         <div className="relative inline-block transform -rotate-2">
@@ -179,7 +179,8 @@ export default function NotebookPortfolio() {
             <div className="mt-8 relative">
               <h3 className="text-xl font-bold text-gray-500 transform -rotate-1 mb-3">My Stack:</h3>
               <div className="flex flex-wrap gap-3">
-                {['Kotlin / Compose', 'WebSockets', 'Next.js', 'Node.js', 'Upstash Redis', 'Python RAG / AI'].map((skill, index) => (
+                {/* Updated skills array to include Server Integration & Prompt Engineering */}
+                {['Kotlin / Compose', 'Server Integration', 'WebSockets', 'Prompt Engineering', 'Next.js', 'Node.js', 'Upstash Redis', 'Python RAG / AI'].map((skill, index) => (
                   <span key={skill} className={`px-4 py-1 border-2 border-gray-800 rounded-lg text-xl font-bold bg-white/50 shadow-sm transition-transform hover:-translate-y-1 ${index % 2 === 0 ? 'transform rotate-1' : 'transform -rotate-1'}`}>
                     {skill}
                   </span>
@@ -193,7 +194,7 @@ export default function NotebookPortfolio() {
             </div>
           </div>
 
-          {/* TIC-TAC-TOE GAME (With increased rotation) */}
+          {/* TIC-TAC-TOE GAME */}
           <div className="w-full md:w-[45%] flex flex-col justify-center items-center relative">
             
             {/* Fun hand-drawn arrow pointing to game */}
