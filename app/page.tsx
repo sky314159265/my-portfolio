@@ -9,7 +9,7 @@ const penFont = Caveat({
   display: 'swap',
 });
 
-// Reusable SVG Components for consistency and clean code
+// Reusable SVG Components
 const OrangeUnderline = ({ className = "", delay = "0s" }) => (
   <svg className={`absolute w-full h-3 text-[#ff5e00] pointer-events-none ${className}`} viewBox="0 0 200 20" preserveAspectRatio="none">
     <path className="live-draw" style={{ animationDelay: delay }} pathLength="100" d="M 2 12 Q 50 8 100 12 T 198 10" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" />
@@ -93,8 +93,26 @@ export default function NotebookPortfolio() {
         html { scroll-behavior: smooth; }
       `}} />
 
-      {/* 1. HEADER (SCALED FOR UX) */}
-      <header className="pt-8 px-6 md:px-12 w-full max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 border-b-2 border-black/10 pb-6 mb-12">
+      {/* --- RANDOM BACKGROUND DOODLES --- */}
+      {/* Top Right Swirl */}
+      <svg className="absolute top-24 right-4 md:right-32 w-24 h-24 text-gray-300 pointer-events-none transform rotate-12" viewBox="0 0 100 100">
+        <path d="M 20 50 C 20 20 80 20 80 50 C 80 80 40 80 40 60 C 40 40 60 40 60 55 C 60 70 50 70 50 65" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/>
+      </svg>
+      
+      {/* Mid Left Scribble */}
+      <svg className="absolute top-[35%] left-2 md:left-12 w-16 h-16 text-gray-300 pointer-events-none transform -rotate-12" viewBox="0 0 100 100">
+        <path d="M 10 30 Q 30 10 50 30 T 90 30 M 15 50 Q 40 30 60 50 T 85 50 M 20 70 Q 50 50 70 70" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/>
+      </svg>
+
+      {/* Bottom Right Stars */}
+      <svg className="absolute top-[65%] right-10 w-16 h-16 text-yellow-400/60 pointer-events-none" viewBox="0 0 100 100">
+        <path d="M 50 10 L 55 45 L 90 50 L 55 55 L 50 90 L 45 55 L 10 50 L 45 45 Z" fill="currentColor"/>
+        <path d="M 20 20 L 25 35 L 40 40 L 25 45 L 20 60 L 15 45 L 0 40 L 15 35 Z" fill="currentColor" transform="scale(0.5) translate(120, -50)"/>
+      </svg>
+      {/* --------------------------------- */}
+
+      {/* 1. HEADER (REMOVED BOTTOM BORDER) */}
+      <header className="pt-8 px-6 md:px-12 w-full max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 pb-6 mb-8 relative z-10">
         
         <div className="relative inline-block transform -rotate-2">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight">
@@ -134,11 +152,12 @@ export default function NotebookPortfolio() {
         </nav>
       </header>
 
-      <main className="w-full max-w-6xl mx-auto px-6 md:px-12 flex flex-col gap-24">
+      <main className="w-full max-w-6xl mx-auto px-6 md:px-12 flex flex-col gap-24 relative z-10">
         
         {/* 2. HERO SECTION */}
-        <section className="flex flex-col-reverse md:flex-row justify-between items-start gap-12">
-          <div className="w-full md:w-3/5">
+        <section className="flex flex-col-reverse md:flex-row justify-between items-start gap-12 relative">
+          
+          <div className="w-full md:w-[55%]">
             <div className="flex items-end gap-2 mb-6">
               <svg className="w-12 h-12 text-gray-900 pb-1 transform -rotate-6" viewBox="0 0 100 100">
                 <path className="live-draw" style={{animationDelay: '1.2s'}} pathLength="100" d="M 15 50 L 25 48 M 25 30 L 35 35 M 50 15 L 50 25 M 75 30 L 65 35 M 85 50 L 75 48" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round"/>
@@ -150,13 +169,39 @@ export default function NotebookPortfolio() {
                 <CyanSquiggle className="-bottom-2 left-0" delay="2.1s" />
               </div>
             </div>
-            <p className="text-2xl md:text-3xl text-gray-900 leading-[1.6] mt-6">
-              I take messy ideas and turn them into products that don't crash. No agency jargon, no bloated code. Just solid architecture, smooth interfaces, unique designs and backend logic that Works from Day one.
+            
+            {/* Professional, Industry Standard Copy */}
+            <p className="text-2xl md:text-[1.65rem] text-gray-800 leading-[1.6] mt-6">
+              I architect and build high-performance, scalable software from the ground up. I bridge the gap between complex backend logic and seamless frontend user experiences, delivering MVPs that are production-ready on day one.
             </p>
+
+            {/* Technical Skills Display */}
+            <div className="mt-8 relative">
+              <h3 className="text-xl font-bold text-gray-500 transform -rotate-1 mb-3">My Stack:</h3>
+              <div className="flex flex-wrap gap-3">
+                {['Kotlin / Compose', 'WebSockets', 'Next.js', 'Node.js', 'Upstash Redis', 'Python RAG / AI'].map((skill, index) => (
+                  <span key={skill} className={`px-4 py-1 border-2 border-gray-800 rounded-lg text-xl font-bold bg-white/50 shadow-sm transition-transform hover:-translate-y-1 ${index % 2 === 0 ? 'transform rotate-1' : 'transform -rotate-1'}`}>
+                    {skill}
+                  </span>
+                ))}
+              </div>
+              
+              {/* Hand-drawn arrow pointing to skills */}
+              <svg className="absolute -right-8 bottom-0 w-12 h-12 text-red-500 pointer-events-none transform rotate-45 hidden md:block" viewBox="0 0 100 100">
+                <path d="M 20 80 Q 50 20 90 20 M 70 10 L 90 20 L 80 40" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
           </div>
 
-          <div className="w-full md:w-2/5 flex flex-col justify-center items-center">
-            <div className="relative w-56 h-56 md:w-72 md:h-72 transform rotate-2">
+          {/* TIC-TAC-TOE GAME (With increased rotation) */}
+          <div className="w-full md:w-[45%] flex flex-col justify-center items-center relative">
+            
+            {/* Fun hand-drawn arrow pointing to game */}
+            <svg className="absolute -top-12 left-10 w-16 h-16 text-blue-500 pointer-events-none transform -rotate-12 hidden md:block" viewBox="0 0 100 100">
+              <path d="M 10 90 Q 30 10 90 50 M 70 35 L 90 50 L 75 70" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+
+            <div className="relative w-56 h-56 md:w-72 md:h-72 transform -rotate-4 transition-transform hover:-rotate-2">
               <svg className="absolute inset-0 w-full h-full text-black pointer-events-none z-0" viewBox="0 0 100 100">
                 <path className="live-draw" style={{animationDelay: '1s'}} pathLength="100" d="M 33 5 L 35 95 M 66 2 L 64 98 M 2 33 L 98 35 M 5 66 L 95 64" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round"/>
                 {winningLine && <path className="live-draw text-black" pathLength="100" d={winningLine} stroke="currentColor" strokeWidth="8" fill="none" strokeLinecap="round"/>}
@@ -180,11 +225,11 @@ export default function NotebookPortfolio() {
             </div>
             <div className="h-10 mt-4">
               {(winningLine || !board.includes(null)) ? (
-                <button onClick={resetGame} className="text-xl font-bold border-2 border-black px-4 py-1 transform -rotate-2 hover:bg-black hover:text-white transition-all bg-white">
+                <button onClick={resetGame} className="text-xl font-bold border-2 border-black px-4 py-1 transform rotate-2 hover:bg-black hover:text-white transition-all bg-white shadow-sm">
                   Play Again ✏️
                 </button>
               ) : (
-                <div className="text-lg text-gray-500 transform -rotate-2">
+                <div className="text-lg text-gray-500 transform rotate-1">
                   {isPlayerTurn ? "(Your turn - You are X)" : "(Website is thinking...)"}
                 </div>
               )}
@@ -193,15 +238,14 @@ export default function NotebookPortfolio() {
         </section>
 
         {/* 3. PROJECTS SECTION */}
-        <section id="projects" className="pt-10 scroll-mt-24">
+        <section id="projects" className="pt-10 scroll-mt-24 relative">
+          
           <div className="relative inline-block mb-10">
             <h2 className="text-4xl font-bold transform -rotate-1">Proof of Work</h2>
             <OrangeUnderline className="-bottom-1" delay="0s" />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            
-            {/* Project Card 1 */}
             <div className="relative bg-white p-4 pb-12 border border-gray-200 shadow-[8px_8px_0_0_rgba(0,0,0,0.8)] transform rotate-1 transition-transform hover:-rotate-1">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-yellow-200/80 transform -rotate-2 border border-yellow-300"></div>
               <div className="aspect-video bg-gray-900 rounded-sm mb-4 flex items-center justify-center text-white border-2 border-black">
@@ -211,7 +255,6 @@ export default function NotebookPortfolio() {
               <p className="text-xl text-gray-700 leading-tight">Kotlin/Jetpack Compose UI powered by real-time WebSockets and Upstash Redis.</p>
             </div>
 
-            {/* Project Card 2 */}
             <div className="relative bg-white p-4 pb-12 border border-gray-200 shadow-[8px_8px_0_0_rgba(0,0,0,0.8)] transform -rotate-2 transition-transform hover:rotate-1">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-yellow-200/80 transform rotate-3 border border-yellow-300"></div>
               <div className="aspect-video bg-blue-900 rounded-sm mb-4 flex items-center justify-center text-white border-2 border-black">
@@ -220,12 +263,11 @@ export default function NotebookPortfolio() {
               <h3 className="text-3xl font-bold mb-2">Agentic Workflow</h3>
               <p className="text-xl text-gray-700 leading-tight">Zero-hallucination data extraction tool using custom Python LLM orchestration.</p>
             </div>
-
           </div>
         </section>
 
         {/* 4. PROCESS / PIPELINE SECTION */}
-        <section className="pt-10">
+        <section className="pt-10 relative">
           <div className="relative inline-block mb-10">
             <h2 className="text-4xl font-bold transform -rotate-1">How it gets built</h2>
             <CyanSquiggle className="-bottom-2" delay="0s" />
@@ -258,19 +300,25 @@ export default function NotebookPortfolio() {
           </div>
           
           <div className="flex flex-col md:flex-row gap-8">
-            <div className="bg-yellow-100 p-6 shadow-md transform -rotate-1 md:w-1/2">
+            <div className="bg-yellow-100 p-6 shadow-md transform -rotate-1 md:w-1/2 border border-yellow-200">
               <p className="text-2xl leading-relaxed mb-4">"Sky didn't just write code, they fixed our entire backend architecture before we even realized it was broken. True engineering mindset."</p>
               <p className="text-xl font-bold text-gray-600">- Startup Founder</p>
             </div>
-            <div className="bg-blue-50 p-6 shadow-md transform rotate-2 md:w-1/2 mt-4 md:mt-0">
+            <div className="bg-blue-50 p-6 shadow-md transform rotate-2 md:w-1/2 mt-4 md:mt-0 border border-blue-100">
               <p className="text-2xl leading-relaxed mb-4">"Fastest MVP turnaround we've had. The Compose UI is butter smooth and the WebSockets handle live data flawlessly."</p>
               <p className="text-xl font-bold text-gray-600">- Technical Lead</p>
             </div>
           </div>
         </section>
 
-        {/* 6. CONTACT SECTION */}
-        <section id="contact" className="pt-10 pb-20 scroll-mt-24 flex flex-col items-center text-center">
+        {/* 6. CONTACT SECTION (With Coffee Doodle) */}
+        <section id="contact" className="pt-10 pb-20 scroll-mt-24 flex flex-col items-center text-center relative">
+          
+          {/* Coffee Cup Doodle */}
+          <svg className="absolute -top-4 right-10 md:right-40 w-16 h-16 text-gray-400 pointer-events-none transform rotate-12 hidden md:block" viewBox="0 0 100 100">
+            <path d="M 20 30 L 70 30 L 65 70 C 65 80 25 80 25 70 Z M 70 40 C 85 40 85 60 70 60 M 35 15 C 35 5 45 25 45 15 M 55 15 C 55 5 65 25 65 15" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+
           <h2 className="text-5xl font-bold mb-6 transform -rotate-2">Let's build something.</h2>
           <p className="text-2xl text-gray-600 mb-8 max-w-xl">
             Currently taking on new projects. If you need robust architecture and zero bloat, drop me a line.
