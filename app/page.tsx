@@ -9,420 +9,284 @@ const penFont = Caveat({
   display: 'swap',
 });
 
+// Reusable SVG Components for consistency and clean code
+const OrangeUnderline = ({ className = "", delay = "0s" }) => (
+  <svg className={`absolute w-full h-3 text-[#ff5e00] pointer-events-none ${className}`} viewBox="0 0 200 20" preserveAspectRatio="none">
+    <path className="live-draw" style={{ animationDelay: delay }} pathLength="100" d="M 2 12 Q 50 8 100 12 T 198 10" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" />
+  </svg>
+);
+
+const CyanSquiggle = ({ className = "", delay = "0s" }) => (
+  <svg className={`absolute w-full h-3 text-[#06b6d4] pointer-events-none ${className}`} viewBox="0 0 300 20" preserveAspectRatio="none">
+    <path className="live-draw" style={{ animationDelay: delay }} pathLength="100" d="M 0 10 L 15 2 L 30 15 L 45 2 L 60 15 L 75 2 L 90 15 L 105 2 L 120 15 L 135 2 L 150 15 L 165 2 L 180 15 L 195 2 L 210 15 L 225 2 L 240 15 L 255 2 L 270 15 L 285 2 L 300 10" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
 export default function NotebookPortfolio() {
-  // --- STATE: TEXT & ERASER ---
-  const [phase, setPhase] = useState<'typing-draft' | 'erasing' | 'typing-final' | 'done'>('typing-draft');
-  const [draftText, setDraftText] = useState('');
-  const [finalText, setFinalText] = useState('');
-  
-  const draftContent = "I build apps. Usually they work. Sometimes they break. I'm just a developer who writes code.";
-  const finalContent = "I take messy ideas and turn them into products that don't crash. No agency jargon, no bloated code. Just solid architecture, smooth interfaces, and backend logic that works on day one.";
+  // --- TIC-TAC-TOE AI STATE ---
+  const [board, setBoard] = useState(Array(9).fill(null));
+  const [isPlayerTurn, setIsPlayerTurn] = useState(true);
+  const [winningLine, setWinningLine] = useState<string | null>(null);
 
-  // --- STATE: THE LIVE EMULATOR UI ---
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'trade' | 'portfolio'>('dashboard');
-  const [btcPrice, setBtcPrice] = useState(64230.50);
-  const [ethPrice, setEthPrice] = useState(3450.20);
-  const [balance, setBalance] = useState(10000.00);
-  const [tradeFlash, setTradeFlash] = useState(false);
+  const winningCombinations = [
+    [0, 1, 2, "M 5 16 L 95 16"], [3, 4, 5, "M 5 50 L 95 50"], [6, 7, 8, "M 5 84 L 95 84"],
+    [0, 3, 6, "M 16 5 L 16 95"], [1, 4, 7, "M 50 5 L 50 95"], [2, 5, 8, "M 84 5 L 84 95"],
+    [0, 4, 8, "M 5 5 L 95 95"],  [2, 4, 6, "M 95 5 L 5 95"]
+  ];
 
-  // --- EFFECTS ---
-  useEffect(() => {
-    let timeout: NodeJS.Timeout;
-    if (phase === 'typing-draft') {
-      if (draftText.length < draftContent.length) {
-        timeout = setTimeout(() => setDraftText(draftContent.slice(0, draftText.length + 1)), 40);
-      } else {
-        timeout = setTimeout(() => setPhase('erasing'), 1500);
-      }
-    } else if (phase === 'erasing') {
-      timeout = setTimeout(() => setPhase('typing-final'), 2000);
-    } else if (phase === 'typing-final') {
-      if (finalText.length < finalContent.length) {
-        timeout = setTimeout(() => setFinalText(finalContent.slice(0, finalText.length + 1)), 30);
-      } else {
-        setPhase('done');
+  const checkWinner = (squares: any[]) => {
+    for (let i = 0; i < winningCombinations.length; i++) {
+      const [a, b, c, path] = winningCombinations[i];
+      if (squares[a as number] && squares[a as number] === squares[b as number] && squares[a as number] === squares[c as number]) {
+        return { winner: squares[a as number], path: path as string };
       }
     }
-    return () => clearTimeout(timeout);
-  }, [phase, draftText, finalText]);
+    return null;
+  };
+
+  const handlePlayerMove = (i: number) => {
+    if (board[i] || winningLine || !isPlayerTurn) return;
+    const newBoard = [...board];
+    newBoard[i] = 'X';
+    setBoard(newBoard);
+    setIsPlayerTurn(false);
+  };
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setBtcPrice(prev => prev + ((Math.random() - 0.5) * 50));
-      setEthPrice(prev => prev + ((Math.random() - 0.5) * 15));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const executeFakeTrade = () => {
-    if (balance >= 100) {
-      setBalance(prev => prev - 100);
-      setTradeFlash(true);
-      setTimeout(() => setTradeFlash(false), 300);
+    const status = checkWinner(board);
+    if (status) {
+      setWinningLine(status.path);
+      return;
     }
+    if (!isPlayerTurn && board.includes(null)) {
+      const timer = setTimeout(() => {
+        const newBoard = [...board];
+        const emptyIndices = newBoard.map((v, i) => v === null ? i : null).filter(v => v !== null) as number[];
+        const randomMove = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+        newBoard[randomMove] = 'O';
+        setBoard(newBoard);
+        setIsPlayerTurn(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isPlayerTurn, board]);
+
+  const resetGame = () => {
+    setBoard(Array(9).fill(null));
+    setIsPlayerTurn(true);
+    setWinningLine(null);
   };
 
   return (
     <div 
-      className={`min-h-screen w-full relative overflow-x-hidden text-gray-900 pb-32 cursor-default select-none ${penFont.className}`}
+      className={`min-h-screen w-full relative overflow-x-hidden text-gray-900 pb-20 cursor-default select-none ${penFont.className}`}
       style={{
         backgroundColor: '#ffffff',
-        backgroundImage: `linear-gradient(to right, #bfdbfe 1px, transparent 1px), linear-gradient(to bottom, #bfdbfe 1px, transparent 1px)`,
-        backgroundSize: '32px 32px'
+        backgroundImage: `linear-gradient(to right, rgba(0,0,0,0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.1) 1px, transparent 1px)`,
+        backgroundSize: '50px 50px',
+        backgroundPosition: 'center top'
       }}
     >
-      {/* GLOBAL CSS ANIMATIONS */}
       <style dangerouslySetInnerHTML={{__html: `
-        /* Hover Circle Fix: Stroke offset starts at 2000 to ensure it is completely hidden */
-        .group:hover .draw-circle { stroke-dashoffset: 0 !important; }
-        
-        /* Sequential Live Drawing */
-        .live-draw {
-          stroke-dasharray: 2000;
-          stroke-dashoffset: 2000;
-          animation: drawPath 3s linear forwards;
-        }
+        .live-draw { stroke-dasharray: 100; stroke-dashoffset: 100; animation: drawPath 1.2s ease-out forwards; }
         @keyframes drawPath { to { stroke-dashoffset: 0; } }
-        
-        /* Pipeline Timing */
-        .seq-1 { animation-delay: 0.5s; }
-        .seq-2 { animation-delay: 3s; }
-        .seq-3 { animation-delay: 5s; }
-        .seq-4 { animation-delay: 8s; }
-        .seq-5 { animation-delay: 10s; }
-        .seq-6 { animation-delay: 13s; }
-        .seq-7 { animation-delay: 15s; }
-        .fade-in-seq { opacity: 0; animation: fadeInText 1s ease forwards; }
-        @keyframes fadeInText { to { opacity: 1; } }
-
-        /* Tic-Tac-Toe Timing */
-        .ttt-grid { animation-delay: 1s; }
-        .ttt-1 { animation-delay: 2s; } /* O */
-        .ttt-2 { animation-delay: 3s; } /* X */
-        .ttt-3 { animation-delay: 4s; } /* O */
-        .ttt-4 { animation-delay: 5s; } /* X */
-        .ttt-5 { animation-delay: 6s; } /* O wins */
-        .ttt-strike { animation-delay: 7s; }
-
-        /* Eraser Animation */
-        @keyframes scrubEraser {
-          0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
-          10% { transform: translate(0, 0) rotate(-15deg); opacity: 1; }
-          20% { transform: translate(300px, 10px) rotate(10deg); }
-          40% { transform: translate(-20px, 30px) rotate(-10deg); }
-          60% { transform: translate(320px, 50px) rotate(15deg); }
-          80% { transform: translate(0px, 80px) rotate(-15deg); opacity: 1; }
-          100% { transform: translate(400px, 150px) rotate(45deg); opacity: 0; }
-        }
-        .animate-eraser { animation: scrubEraser 2s ease-in-out forwards; }
-        
-        @keyframes fadeOutDraft {
-          0% { opacity: 1; } 40% { opacity: 0.5; } 80% { opacity: 0; } 100% { opacity: 0; }
-        }
-        .erasing-text { animation: fadeOutDraft 1.5s ease-in-out forwards; }
+        html { scroll-behavior: smooth; }
       `}} />
 
-      {/* 1. HEADER */}
-      <header className="absolute top-8 left-8 md:top-12 md:left-12 z-50">
-        <div className="group relative inline-block cursor-pointer">
-          <h1 className="text-5xl md:text-6xl text-black font-bold transform -rotate-2">
-            Hi, I'm Sky.
+      {/* 1. HEADER (SCALED FOR UX) */}
+      <header className="pt-8 px-6 md:px-12 w-full max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 border-b-2 border-black/10 pb-6 mb-12">
+        
+        <div className="relative inline-block transform -rotate-2">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight">
+            Hi, I'm sky!
           </h1>
-          {/* 
-            BUG FIX: Added inline style to enforce dash array hiding before hover.
-            The group-hover in CSS overrides this to 0. 
-          */}
-          <svg className="absolute -inset-4 w-[120%] h-[140%] text-red-500 pointer-events-none transform -rotate-2" viewBox="0 0 200 100" preserveAspectRatio="none">
-            <path 
-              className="draw-circle transition-all duration-700 ease-out" 
-              style={{ strokeDasharray: 2000, strokeDashoffset: 2000 }}
-              d="M 100 5 C 160 5 190 20 195 50 C 200 80 160 95 100 95 C 40 95 5 80 5 50 C 5 20 40 5 90 8 Z" 
-              stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"
-            />
-          </svg>
+          <OrangeUnderline className="-bottom-1 left-0" delay="0.2s" />
         </div>
+
+        <nav className="flex justify-center gap-6 md:gap-12">
+          <a href="#projects" className="flex flex-col items-center relative group cursor-pointer hover:-translate-y-1 transition-transform">
+            <svg className="w-8 h-8 md:w-10 md:h-10 text-gray-900 mb-1" viewBox="0 0 100 100">
+              <path className="live-draw" style={{animationDelay: '0.4s'}} pathLength="100" d="M 15 80 L 85 80 L 75 30 L 50 55 L 25 30 Z" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+              <circle className="live-draw" style={{animationDelay: '0.6s'}} pathLength="100" cx="25" cy="20" r="5" stroke="currentColor" strokeWidth="4" fill="none"/>
+              <circle className="live-draw" style={{animationDelay: '0.7s'}} pathLength="100" cx="50" cy="45" r="5" stroke="currentColor" strokeWidth="4" fill="none"/>
+              <circle className="live-draw" style={{animationDelay: '0.8s'}} pathLength="100" cx="75" cy="20" r="5" stroke="currentColor" strokeWidth="4" fill="none"/>
+            </svg>
+            <span className="text-2xl font-bold transform -rotate-1">Projects</span>
+            <OrangeUnderline className="-bottom-1" delay="0.9s" />
+          </a>
+
+          <a href="#contact" className="flex flex-col items-center relative group cursor-pointer hover:-translate-y-1 transition-transform">
+            <svg className="w-8 h-8 md:w-10 md:h-10 text-gray-900 mb-1" viewBox="0 0 100 100">
+              <path className="live-draw" style={{animationDelay: '0.6s'}} pathLength="100" d="M 10 60 L 90 20 L 60 90 L 50 65 Z M 90 20 L 50 65 M 40 60 L 50 65 L 45 85 Z" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span className="text-2xl font-bold transform -rotate-1">Contact</span>
+            <OrangeUnderline className="-bottom-1" delay="1.1s" />
+          </a>
+
+          <a href="#testimonials" className="flex flex-col items-center relative group cursor-pointer hover:-translate-y-1 transition-transform">
+            <svg className="w-8 h-8 md:w-10 md:h-10 text-gray-900 mb-1" viewBox="0 0 100 100">
+              <path className="live-draw" style={{animationDelay: '0.8s'}} pathLength="100" d="M 20 30 L 70 30 L 70 70 L 40 70 L 20 90 L 20 70 L 20 30 Z" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+              <path className="live-draw" style={{animationDelay: '1s'}} pathLength="100" d="M 35 45 L 55 45 M 35 55 L 45 55" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round"/>
+            </svg>
+            <span className="text-2xl font-bold transform -rotate-1">Testimonials</span>
+            <OrangeUnderline className="-bottom-1" delay="1.3s" />
+          </a>
+        </nav>
       </header>
 
-      {/* 2. WHAT I ACTUALLY DO & TIC-TAC-TOE */}
-      <section className="pt-40 md:pt-48 px-8 md:px-16 w-full max-w-6xl mx-auto flex flex-col md:flex-row gap-12 justify-between">
+      <main className="w-full max-w-6xl mx-auto px-6 md:px-12 flex flex-col gap-24">
         
-        <div className="w-full md:w-2/3">
-          <h2 className="text-4xl font-bold mb-6 underline decoration-blue-400 decoration-wavy underline-offset-4 transform -rotate-1">What I actually do:</h2>
-          <div className="relative text-4xl text-gray-800 leading-relaxed min-h-[150px]">
-            {(phase === 'typing-draft' || phase === 'erasing') && (
-              <p className={`absolute top-0 left-0 text-gray-500 ${phase === 'erasing' ? 'erasing-text' : ''}`}>
-                {draftText}{phase === 'typing-draft' && <span className="animate-pulse">|</span>}
-              </p>
-            )}
-            {phase === 'erasing' && (
-              <div className="absolute top-0 left-0 z-20 animate-eraser pointer-events-none">
-                <svg width="80" height="60" viewBox="0 0 100 80" className="drop-shadow-lg">
-                  <path d="M10 40 L40 10 L90 30 L60 60 Z" fill="#fbcfe8" stroke="#f472b6" strokeWidth="3"/>
-                  <path d="M10 40 L10 55 L35 75 L60 60 L60 45" fill="#f9a8d4" stroke="#f472b6" strokeWidth="3"/>
-                  <path d="M35 75 L90 45 L90 30 L60 60" fill="#fdf2f8" stroke="#f472b6" strokeWidth="3"/>
-                </svg>
-              </div>
-            )}
-            {(phase === 'typing-final' || phase === 'done') && (
-              <p className="absolute top-0 left-0 text-black">
-                {finalText}{phase === 'typing-final' && <span className="animate-pulse">|</span>}
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* Self-Playing Tic-Tac-Toe Doodle */}
-        <div className="w-full md:w-1/3 flex justify-center items-center mt-12 md:mt-0 opacity-80 transform rotate-2">
-          <svg className="w-48 h-48 text-gray-800" viewBox="0 0 100 100">
-            {/* Grid */}
-            <path className="live-draw ttt-grid" d="M 33 5 L 33 95 M 66 5 L 66 95 M 5 33 L 95 33 M 5 66 L 95 66" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round"/>
-            {/* Move 1: O Top Left */}
-            <circle className="live-draw ttt-1" cx="19" cy="19" r="10" stroke="blue" strokeWidth="3" fill="none"/>
-            {/* Move 2: X Center */}
-            <path className="live-draw ttt-2" d="M 40 40 L 60 60 M 60 40 L 40 60" stroke="red" strokeWidth="3" fill="none" strokeLinecap="round"/>
-            {/* Move 3: O Top Right */}
-            <circle className="live-draw ttt-3" cx="81" cy="19" r="10" stroke="blue" strokeWidth="3" fill="none"/>
-            {/* Move 4: X Bottom Left */}
-            <path className="live-draw ttt-4" d="M 10 70 L 30 90 M 30 70 L 10 90" stroke="red" strokeWidth="3" fill="none" strokeLinecap="round"/>
-            {/* Move 5: O Top Middle (Wins) */}
-            <circle className="live-draw ttt-5" cx="50" cy="19" r="10" stroke="blue" strokeWidth="3" fill="none"/>
-            {/* Winning Strike */}
-            <path className="live-draw ttt-strike" d="M 5 19 L 95 19" stroke="blue" strokeWidth="5" fill="none" strokeLinecap="round"/>
-          </svg>
-        </div>
-      </section>
-
-      {/* 3. HOW IT GETS BUILT (Aligned to left, Literal Drawings) */}
-      <section className="mt-40 px-8 md:px-16 w-full max-w-6xl mx-auto">
-        <h2 className="text-4xl font-bold mb-16 transform rotate-1 underline decoration-blue-400 decoration-wavy underline-offset-4">How it gets built:</h2>
-        
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 relative">
-          
-          {/* Step 1: Drawboard (Blueprint & Pencil) */}
-          <div className="relative flex flex-col items-center">
-            <svg className="w-32 h-32 text-gray-800 transform -rotate-2" viewBox="0 0 100 100">
-              {/* Clipboard paper */}
-              <path className="live-draw seq-1" d="M 25 15 L 75 15 L 75 85 L 25 85 Z" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-              {/* Clip */}
-              <path className="live-draw seq-1" d="M 40 15 L 40 5 L 60 5 L 60 15" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-              {/* Pencil drawing a line */}
-              <path className="live-draw seq-1" d="M 65 50 L 85 30 L 90 35 L 70 55 Z M 65 50 L 60 55 L 70 55 M 35 55 L 60 55" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            <p className="text-2xl text-blue-700 mt-2 text-center font-bold fade-in-seq seq-1">Drawboard<br/>Planning</p>
-          </div>
-
-          <svg className="hidden md:block w-24 h-16 text-red-500" viewBox="0 0 100 50">
-            <path className="live-draw seq-2" d="M 0 25 Q 50 -10 100 25" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round"/>
-            <path className="live-draw seq-2" d="M 85 15 L 100 25 L 85 35" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round"/>
-          </svg>
-
-          {/* Step 2: Integration (Gears / Puzzle Pieces) */}
-          <div className="relative flex flex-col items-center mt-8 md:mt-0">
-            <svg className="w-32 h-32 text-gray-800 transform rotate-3" viewBox="0 0 100 100">
-              {/* Two interlocking puzzle pieces */}
-              <path className="live-draw seq-3" d="M 20 30 L 40 30 C 40 20 60 20 60 30 L 80 30 L 80 50 C 90 50 90 70 80 70 L 80 90 L 60 90 C 60 80 40 80 40 90 L 20 90 L 20 70 C 10 70 10 50 20 50 Z" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-              {/* Inner connection lines */}
-              <path className="live-draw seq-3" d="M 40 50 C 40 40 60 40 60 50 M 50 60 L 50 80" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/>
-            </svg>
-            <p className="text-2xl text-blue-700 mt-2 text-center font-bold fade-in-seq seq-3">Integration<br/>Logic</p>
-          </div>
-
-          <svg className="hidden md:block w-24 h-16 text-red-500" viewBox="0 0 100 50">
-            <path className="live-draw seq-4" d="M 0 25 Q 50 60 100 25" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round"/>
-            <path className="live-draw seq-4" d="M 85 15 L 100 25 L 85 35" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round"/>
-          </svg>
-
-          {/* Step 3: Debugging (Bug getting squashed) */}
-          <div className="relative flex flex-col items-center mt-8 md:mt-0">
-            <svg className="w-32 h-32 text-gray-800 transform -rotate-1" viewBox="0 0 100 100">
-              {/* Bug Body */}
-              <path className="live-draw seq-5" d="M 40 30 C 40 10 60 10 60 30 L 60 70 C 60 90 40 90 40 70 Z" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round"/>
-              {/* Legs & Antennae */}
-              <path className="live-draw seq-5" d="M 45 30 L 30 20 M 55 30 L 70 20 M 40 45 L 20 45 M 60 45 L 80 45 M 40 60 L 25 75 M 60 60 L 75 75" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/>
-              {/* Big Red Cross out */}
-              <circle className="live-draw seq-5 text-red-500" cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="4" fill="none"/>
-              <path className="live-draw seq-5 text-red-500" d="M 20 20 L 80 80" stroke="currentColor" strokeWidth="4" fill="none"/>
-            </svg>
-            <p className="text-2xl text-blue-700 mt-2 text-center font-bold fade-in-seq seq-5">Hostile<br/>Debugging</p>
-          </div>
-
-          <svg className="hidden md:block w-24 h-16 text-red-500" viewBox="0 0 100 50">
-            <path className="live-draw seq-6" d="M 0 25 Q 50 -10 100 25" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round"/>
-            <path className="live-draw seq-6" d="M 85 15 L 100 25 L 85 35" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round"/>
-          </svg>
-
-          {/* Step 4: Deployment (Rocketship) */}
-          <div className="relative flex flex-col items-center mt-8 md:mt-0">
-            <svg className="w-32 h-32 text-gray-800 transform rotate-2" viewBox="0 0 100 100">
-              {/* Rocket Body */}
-              <path className="live-draw seq-7" d="M 50 10 C 65 30 65 60 65 70 L 35 70 C 35 60 35 30 50 10 Z" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-              {/* Fins */}
-              <path className="live-draw seq-7" d="M 35 60 L 20 80 L 35 70 M 65 60 L 80 80 L 65 70" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-              {/* Window & Fire */}
-              <circle className="live-draw seq-7" cx="50" cy="45" r="8" stroke="currentColor" strokeWidth="2" fill="none"/>
-              <path className="live-draw seq-7 text-red-500" d="M 40 70 L 40 90 L 50 80 L 60 90 L 60 70" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            <p className="text-2xl text-red-600 mt-2 text-center font-bold fade-in-seq seq-7">Ship to<br/>Production</p>
-          </div>
-
-        </div>
-      </section>
-
-      {/* 4. THE LIVE EMULATOR SHOWCASE */}
-      <section className="mt-48 w-full border-t-4 border-black border-dashed pt-24 bg-gray-50/50 pb-32">
-        <div className="max-w-6xl mx-auto px-8 md:px-16 flex flex-col lg:flex-row items-center justify-between gap-16">
-          
-          <div className="lg:w-1/2">
-            <h2 className="text-5xl font-bold mb-6 transform -rotate-1">What I've Built</h2>
-            <h3 className="text-4xl text-blue-700 font-bold mb-6 underline decoration-wavy">Cnoize Trading Engine</h3>
-            <p className="text-3xl text-gray-800 leading-relaxed mb-8">
-              Click through the tabs on the emulator. Check the live market data dashboard, swipe through the layout, and try placing a dummy trade to see the instant WebSocket response. 
-            </p>
-            <p className="text-2xl text-red-500 font-bold transform rotate-2 animate-bounce">
-              (Interact with the prototype -&gt;)
-            </p>
-          </div>
-
-          <div className="lg:w-1/2 flex justify-center">
-            <div className="relative bg-white p-6 pb-20 shadow-[20px_20px_0_0_rgba(0,0,0,0.8)] border-2 border-black transform rotate-2 max-w-sm w-full">
-              <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-40 h-10 bg-yellow-100/90 transform -rotate-3 border border-yellow-300 shadow-sm z-30"></div>
-
-              {/* THE FULLY INTERACTIVE EMULATOR */}
-              <div className="relative w-full aspect-[9/19] bg-gray-950 rounded-3xl border-[12px] border-black overflow-hidden shadow-inner font-sans text-white flex flex-col">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-black rounded-b-2xl z-20"></div>
-
-                {/* DYNAMIC CONTENT AREA based on activeTab */}
-                <div className="flex-1 p-5 pt-12 overflow-y-auto no-scrollbar">
-                  
-                  {activeTab === 'dashboard' && (
-                    <div className="animate-in slide-in-from-right-4 duration-300">
-                      <h4 className="text-gray-400 text-xs font-bold tracking-widest mb-4">MARKET OVERVIEW</h4>
-                      
-                      {/* BTC Card */}
-                      <div className="bg-gray-900 rounded-xl p-4 mb-3 border border-gray-800 flex justify-between items-center cursor-pointer hover:bg-gray-800 transition-colors">
-                        <div>
-                          <div className="font-bold">BTC</div>
-                          <div className="text-gray-400 text-xs">Bitcoin</div>
-                        </div>
-                        {/* Fake SVG Sparkline */}
-                        <svg className="w-16 h-8 text-emerald-500" viewBox="0 0 100 50">
-                          <path d="M 0 40 L 20 30 L 40 45 L 60 20 L 80 25 L 100 5" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round"/>
-                        </svg>
-                        <div className="text-right">
-                          <div className="font-mono font-bold">${btcPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
-                          <div className="text-emerald-500 text-xs">+1.2%</div>
-                        </div>
-                      </div>
-
-                      {/* ETH Card */}
-                      <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 flex justify-between items-center cursor-pointer hover:bg-gray-800 transition-colors">
-                        <div>
-                          <div className="font-bold">ETH</div>
-                          <div className="text-gray-400 text-xs">Ethereum</div>
-                        </div>
-                        <svg className="w-16 h-8 text-red-500" viewBox="0 0 100 50">
-                          <path d="M 0 10 L 20 30 L 40 20 L 60 45 L 80 30 L 100 40" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round"/>
-                        </svg>
-                        <div className="text-right">
-                          <div className="font-mono font-bold">${ethPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
-                          <div className="text-red-500 text-xs">-0.4%</div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {activeTab === 'trade' && (
-                    <div className="animate-in slide-in-from-bottom-4 duration-300 h-full flex flex-col justify-center">
-                      <h4 className="text-gray-400 text-xs font-bold tracking-widest mb-1 text-center">INSTANT EXECUTION</h4>
-                      <div className="text-center mt-2 mb-8">
-                        <div className="text-gray-400 text-sm">Purchasing Power</div>
-                        <div className="text-4xl font-black font-mono tracking-tighter">${balance.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-                      </div>
-
-                      <div className="bg-gray-900 rounded-xl p-6 border border-gray-800 relative overflow-hidden">
-                        <div className={`absolute inset-0 bg-emerald-500/20 transition-opacity duration-300 ${tradeFlash ? 'opacity-100' : 'opacity-0'}`}></div>
-                        <div className="flex justify-between items-center mb-6 relative z-10">
-                          <span className="font-bold text-lg">BTC/USD</span>
-                          <span className="font-mono font-bold text-xl">${btcPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
-                        </div>
-                        <button onClick={executeFakeTrade} className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-black py-4 rounded-xl transition-colors relative z-10 cursor-pointer active:scale-95 text-lg shadow-lg">
-                          MARKET BUY $100
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {activeTab === 'portfolio' && (
-                    <div className="animate-in slide-in-from-left-4 duration-300">
-                      <h4 className="text-gray-400 text-xs font-bold tracking-widest mb-6">ASSET ALLOCATION</h4>
-                      
-                      {/* Hand-drawn Donut Chart SVG */}
-                      <div className="flex justify-center mb-8">
-                        <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 100 100">
-                          <circle cx="50" cy="50" r="40" stroke="#1f2937" strokeWidth="15" fill="none" />
-                          <circle cx="50" cy="50" r="40" stroke="#10b981" strokeWidth="15" fill="none" strokeDasharray="180 250" />
-                          <circle cx="50" cy="50" r="40" stroke="#3b82f6" strokeWidth="15" fill="none" strokeDasharray="50 250" strokeDashoffset="-180" />
-                        </svg>
-                      </div>
-
-                      <div className="space-y-3">
-                        <div className="flex justify-between items-center">
-                          <div className="flex items-center gap-2"><div className="w-3 h-3 bg-emerald-500 rounded-full"></div><span className="text-sm">Bitcoin</span></div>
-                          <span className="font-mono">72%</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <div className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-500 rounded-full"></div><span className="text-sm">Ethereum</span></div>
-                          <span className="font-mono">20%</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <div className="flex items-center gap-2"><div className="w-3 h-3 bg-gray-700 rounded-full"></div><span className="text-sm">USD Cash</span></div>
-                          <span className="font-mono">8%</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                </div>
-
-                {/* BOTTOM NAVIGATION BAR */}
-                <div className="w-full bg-gray-900 border-t border-gray-800 p-4 flex justify-between items-center pb-6 px-8 relative z-30">
-                  <button onClick={() => setActiveTab('dashboard')} className={`flex flex-col items-center gap-1 ${activeTab === 'dashboard' ? 'text-white' : 'text-gray-500 hover:text-gray-300'}`}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                    <span className="text-[10px] font-bold">Dash</span>
-                  </button>
-                  
-                  <button onClick={() => setActiveTab('trade')} className={`flex flex-col items-center gap-1 ${activeTab === 'trade' ? 'text-emerald-500' : 'text-gray-500 hover:text-gray-300'}`}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-                    <span className="text-[10px] font-bold">Trade</span>
-                  </button>
-
-                  <button onClick={() => setActiveTab('portfolio')} className={`flex flex-col items-center gap-1 ${activeTab === 'portfolio' ? 'text-white' : 'text-gray-500 hover:text-gray-300'}`}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path></svg>
-                    <span className="text-[10px] font-bold">Wallet</span>
-                  </button>
-                </div>
-
-              </div>
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-3xl text-black font-bold transform -rotate-1 whitespace-nowrap">
-                "Live Cnoize Build"
+        {/* 2. HERO SECTION */}
+        <section className="flex flex-col-reverse md:flex-row justify-between items-start gap-12">
+          <div className="w-full md:w-3/5">
+            <div className="flex items-end gap-2 mb-6">
+              <svg className="w-12 h-12 text-gray-900 pb-1 transform -rotate-6" viewBox="0 0 100 100">
+                <path className="live-draw" style={{animationDelay: '1.2s'}} pathLength="100" d="M 15 50 L 25 48 M 25 30 L 35 35 M 50 15 L 50 25 M 75 30 L 65 35 M 85 50 L 75 48" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round"/>
+                <path className="live-draw" style={{animationDelay: '1.5s'}} pathLength="100" d="M 35 70 C 20 60 20 35 50 35 C 80 35 80 60 65 70 L 65 80 L 35 80 Z" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+                <path className="live-draw" style={{animationDelay: '1.7s'}} pathLength="100" d="M 40 85 L 60 85 M 40 90 L 60 90 M 45 95 L 55 95" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round"/>
+              </svg>
+              <div className="relative mb-1">
+                <h2 className="text-3xl md:text-4xl font-bold tracking-tight transform -rotate-1">What i Actually do :</h2>
+                <CyanSquiggle className="-bottom-2 left-0" delay="2.1s" />
               </div>
             </div>
+            <p className="text-2xl md:text-3xl text-gray-900 leading-[1.6] mt-6">
+              I take messy ideas and turn them into products that don't crash. No agency jargon, no bloated code. Just solid architecture, smooth interfaces, unique designs and backend logic that Works from Day one.
+            </p>
           </div>
 
-        </div>
-      </section>
-
-      {/* 5. FOOTER & CTA */}
-      <footer className="mt-16 px-8 md:px-12 w-full flex flex-col items-center text-center">
-        <h2 className="text-5xl font-bold mb-8 transform rotate-1">Ready to start?</h2>
-        <a href="mailto:your.email@gmail.com" className="group relative inline-block cursor-pointer">
-          <div className="absolute inset-0 bg-black rounded-lg transform -rotate-2 group-hover:rotate-0 transition-transform"></div>
-          <div className="relative bg-white border-4 border-black px-12 py-6 text-4xl font-bold transform rotate-1 group-hover:rotate-0 transition-transform">
-            Book a Scoping Call
+          <div className="w-full md:w-2/5 flex flex-col justify-center items-center">
+            <div className="relative w-56 h-56 md:w-72 md:h-72 transform rotate-2">
+              <svg className="absolute inset-0 w-full h-full text-black pointer-events-none z-0" viewBox="0 0 100 100">
+                <path className="live-draw" style={{animationDelay: '1s'}} pathLength="100" d="M 33 5 L 35 95 M 66 2 L 64 98 M 2 33 L 98 35 M 5 66 L 95 64" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round"/>
+                {winningLine && <path className="live-draw text-black" pathLength="100" d={winningLine} stroke="currentColor" strokeWidth="8" fill="none" strokeLinecap="round"/>}
+              </svg>
+              <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 z-10">
+                {board.map((cell, i) => (
+                  <div key={i} onClick={() => handlePlayerMove(i)} className="w-full h-full flex items-center justify-center cursor-pointer hover:bg-black/5 rounded-md">
+                    {cell === 'X' && (
+                      <svg className="w-12 h-12 text-black" viewBox="0 0 100 100">
+                        <path className="live-draw" pathLength="100" d="M 15 15 L 85 85 M 85 15 L 15 85" stroke="currentColor" strokeWidth="6" fill="none" strokeLinecap="round"/>
+                      </svg>
+                    )}
+                    {cell === 'O' && (
+                      <svg className="w-12 h-12 text-black" viewBox="0 0 100 100">
+                        <circle className="live-draw" pathLength="100" cx="50" cy="50" r="35" stroke="currentColor" strokeWidth="6" fill="none"/>
+                      </svg>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="h-10 mt-4">
+              {(winningLine || !board.includes(null)) ? (
+                <button onClick={resetGame} className="text-xl font-bold border-2 border-black px-4 py-1 transform -rotate-2 hover:bg-black hover:text-white transition-all bg-white">
+                  Play Again ✏️
+                </button>
+              ) : (
+                <div className="text-lg text-gray-500 transform -rotate-2">
+                  {isPlayerTurn ? "(Your turn - You are X)" : "(Website is thinking...)"}
+                </div>
+              )}
+            </div>
           </div>
-        </a>
-      </footer>
+        </section>
 
+        {/* 3. PROJECTS SECTION */}
+        <section id="projects" className="pt-10 scroll-mt-24">
+          <div className="relative inline-block mb-10">
+            <h2 className="text-4xl font-bold transform -rotate-1">Proof of Work</h2>
+            <OrangeUnderline className="-bottom-1" delay="0s" />
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            
+            {/* Project Card 1 */}
+            <div className="relative bg-white p-4 pb-12 border border-gray-200 shadow-[8px_8px_0_0_rgba(0,0,0,0.8)] transform rotate-1 transition-transform hover:-rotate-1">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-yellow-200/80 transform -rotate-2 border border-yellow-300"></div>
+              <div className="aspect-video bg-gray-900 rounded-sm mb-4 flex items-center justify-center text-white border-2 border-black">
+                <span className="font-mono text-sm opacity-50">CNOIZE_TRADING_ENGINE_UI</span>
+              </div>
+              <h3 className="text-3xl font-bold mb-2">Cnoize Trading App</h3>
+              <p className="text-xl text-gray-700 leading-tight">Kotlin/Jetpack Compose UI powered by real-time WebSockets and Upstash Redis.</p>
+            </div>
+
+            {/* Project Card 2 */}
+            <div className="relative bg-white p-4 pb-12 border border-gray-200 shadow-[8px_8px_0_0_rgba(0,0,0,0.8)] transform -rotate-2 transition-transform hover:rotate-1">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-yellow-200/80 transform rotate-3 border border-yellow-300"></div>
+              <div className="aspect-video bg-blue-900 rounded-sm mb-4 flex items-center justify-center text-white border-2 border-black">
+                <span className="font-mono text-sm opacity-50">AI_RAG_PIPELINE_SYS</span>
+              </div>
+              <h3 className="text-3xl font-bold mb-2">Agentic Workflow</h3>
+              <p className="text-xl text-gray-700 leading-tight">Zero-hallucination data extraction tool using custom Python LLM orchestration.</p>
+            </div>
+
+          </div>
+        </section>
+
+        {/* 4. PROCESS / PIPELINE SECTION */}
+        <section className="pt-10">
+          <div className="relative inline-block mb-10">
+            <h2 className="text-4xl font-bold transform -rotate-1">How it gets built</h2>
+            <CyanSquiggle className="-bottom-2" delay="0s" />
+          </div>
+
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+            {['Drawboard Scope', 'Integration Logic', 'Hostile Debugging', 'Ship to Prod'].map((step, i) => (
+              <React.Fragment key={step}>
+                <div className={`flex flex-col items-center transform ${i % 2 === 0 ? 'rotate-2' : '-rotate-2'}`}>
+                  <div className="w-16 h-16 rounded-full border-2 border-black bg-white flex items-center justify-center text-2xl font-bold shadow-[4px_4px_0_0_rgba(0,0,0,1)] mb-2">
+                    {i + 1}
+                  </div>
+                  <h4 className="text-2xl font-bold text-center">{step}</h4>
+                </div>
+                {i < 3 && (
+                  <svg className="hidden md:block w-16 h-8 text-gray-400" viewBox="0 0 100 50">
+                    <path d="M 0 25 Q 50 -10 100 25 M 85 15 L 100 25 L 85 35" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round"/>
+                  </svg>
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+        </section>
+
+        {/* 5. TESTIMONIALS SECTION */}
+        <section id="testimonials" className="pt-10 scroll-mt-24">
+          <div className="relative inline-block mb-10">
+            <h2 className="text-4xl font-bold transform -rotate-1">Word on the street</h2>
+            <OrangeUnderline className="-bottom-1" delay="0s" />
+          </div>
+          
+          <div className="flex flex-col md:flex-row gap-8">
+            <div className="bg-yellow-100 p-6 shadow-md transform -rotate-1 md:w-1/2">
+              <p className="text-2xl leading-relaxed mb-4">"Sky didn't just write code, they fixed our entire backend architecture before we even realized it was broken. True engineering mindset."</p>
+              <p className="text-xl font-bold text-gray-600">- Startup Founder</p>
+            </div>
+            <div className="bg-blue-50 p-6 shadow-md transform rotate-2 md:w-1/2 mt-4 md:mt-0">
+              <p className="text-2xl leading-relaxed mb-4">"Fastest MVP turnaround we've had. The Compose UI is butter smooth and the WebSockets handle live data flawlessly."</p>
+              <p className="text-xl font-bold text-gray-600">- Technical Lead</p>
+            </div>
+          </div>
+        </section>
+
+        {/* 6. CONTACT SECTION */}
+        <section id="contact" className="pt-10 pb-20 scroll-mt-24 flex flex-col items-center text-center">
+          <h2 className="text-5xl font-bold mb-6 transform -rotate-2">Let's build something.</h2>
+          <p className="text-2xl text-gray-600 mb-8 max-w-xl">
+            Currently taking on new projects. If you need robust architecture and zero bloat, drop me a line.
+          </p>
+          <a href="mailto:your.email@gmail.com" className="relative group inline-block cursor-pointer">
+            <div className="absolute inset-0 bg-black transform rotate-2 group-hover:rotate-0 transition-transform"></div>
+            <div className="relative bg-white border-2 border-black px-8 py-3 text-3xl font-bold transform -rotate-1 group-hover:rotate-0 transition-transform flex items-center gap-3">
+              <svg className="w-6 h-6" viewBox="0 0 100 100">
+                <path d="M 10 60 L 90 20 L 60 90 L 50 65 Z M 90 20 L 50 65 M 40 60 L 50 65 L 45 85 Z" stroke="currentColor" strokeWidth="6" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Say Hello
+            </div>
+          </a>
+        </section>
+
+      </main>
     </div>
   );
 }
