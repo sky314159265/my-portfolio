@@ -238,7 +238,7 @@ export default function NotebookPortfolio() {
                 <img
                    src="/cnoize.png"
                    alt="cnoize Tarding app Interface"
-                   clasname="w-full h-full object=cover"
+                   className="w-full h-full object=cover"
                    />
               </div>
               <h3 className="text-3xl font-bold mb-2">Cnoize Trading App</h3>
