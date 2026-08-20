@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Caveat } from 'next/font/google';
 
 const penFont = Caveat({ 
@@ -9,7 +9,7 @@ const penFont = Caveat({
   display: 'swap',
 });
 
-// Reusable SVG Components
+// --- REUSABLE SVG COMPONENTS ---
 const OrangeUnderline = ({ className = "", delay = "0s" }) => (
   <svg className={`absolute w-full h-3 text-[#ff5e00] pointer-events-none ${className}`} viewBox="0 0 200 20" preserveAspectRatio="none">
     <path className="live-draw" style={{ animationDelay: delay }} pathLength="100" d="M 2 12 Q 50 8 100 12 T 198 10" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" />
@@ -22,7 +22,233 @@ const CyanSquiggle = ({ className = "", delay = "0s" }) => (
   </svg>
 );
 
+// ==========================================
+// --- ADVANCED PIPELINE SUB-COMPONENTS ---
+// ==========================================
+
+const DrawboardStep = () => (
+  <div className="w-full h-full bg-[#f8fafc] relative flex flex-col items-center justify-center overflow-hidden">
+    <h3 className="absolute top-4 left-6 text-2xl md:text-3xl font-bold text-gray-800 transform -rotate-2 z-20">1. Architecture Scope</h3>
+    
+    <div className="relative w-full h-full flex items-center justify-center px-4 mt-8">
+      
+      {/* THE LIVE DRAWING STICKMAN */}
+      <div className="relative w-24 h-40 md:w-32 md:h-48 transform -translate-y-4">
+        <svg className="w-full h-full text-black" viewBox="0 0 100 150">
+           {/* Head */}
+           <circle className="live-draw" pathLength="100" cx="40" cy="30" r="18" stroke="currentColor" strokeWidth="4" fill="none"/>
+           {/* Body */}
+           <path className="live-draw" style={{animationDelay: '0.2s'}} pathLength="100" d="M 40 48 L 40 100" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round"/>
+           {/* Left Leg */}
+           <path className="live-draw" style={{animationDelay: '0.4s'}} pathLength="100" d="M 40 100 L 20 140" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round"/>
+           {/* Right Leg */}
+           <path className="live-draw" style={{animationDelay: '0.5s'}} pathLength="100" d="M 40 100 L 60 140" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round"/>
+           {/* Left Arm */}
+           <path className="live-draw" style={{animationDelay: '0.6s'}} pathLength="100" d="M 40 60 L 20 80" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round"/>
+           
+           {/* RIGHT ARM (ANIMATED DRAWING MOTION) */}
+           <g className="origin-[40px_60px] animate-[sketchMotion_0.3s_linear_infinite_alternate]" style={{ animationDelay: '1s' }}>
+             <path d="M 40 60 L 80 40 L 95 35" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+             {/* Pen */}
+             <path d="M 90 35 L 105 25" stroke="blue" strokeWidth="3" fill="none" strokeLinecap="round"/>
+           </g>
+        </svg>
+
+        {/* Brainstorming Bubbles */}
+        <svg className="absolute -top-4 -left-4 w-16 h-20 text-orange-500" viewBox="0 0 50 80">
+          <circle className="live-draw" style={{animationDelay: '1.5s'}} pathLength="100" cx="40" cy="70" r="3" stroke="currentColor" strokeWidth="2" fill="none"/>
+          <circle className="live-draw" style={{animationDelay: '1.7s'}} pathLength="100" cx="30" cy="55" r="6" stroke="currentColor" strokeWidth="2" fill="none"/>
+          <circle className="live-draw" style={{animationDelay: '1.9s'}} pathLength="100" cx="20" cy="25" r="15" stroke="currentColor" strokeWidth="2" fill="none"/>
+        </svg>
+      </div>
+
+      {/* THE WHITEBOARD (Complex System Arch Drawing) */}
+      <div className="w-56 h-40 md:w-72 md:h-52 bg-white border-4 border-gray-900 shadow-[8px_8px_0_0_rgba(0,0,0,0.15)] transform rotate-1 relative ml-2 p-2 flex items-center justify-center">
+        <svg className="w-full h-full text-black" viewBox="0 0 200 150">
+          {/* Client App (Phone) */}
+          <rect className="live-draw" style={{animationDelay: '1.2s'}} pathLength="100" x="10" y="50" width="30" height="50" rx="4" stroke="currentColor" strokeWidth="3" fill="none"/>
+          <circle className="live-draw" style={{animationDelay: '1.5s'}} pathLength="100" cx="25" cy="90" r="2" stroke="currentColor" strokeWidth="2" fill="none"/>
+          
+          {/* Arrow 1 */}
+          <path className="live-draw" style={{animationDelay: '2s'}} pathLength="100" d="M 45 75 L 75 75" stroke="#3b82f6" strokeWidth="3" strokeDasharray="4 4" fill="none"/>
+          <path className="live-draw" style={{animationDelay: '2.2s'}} pathLength="100" d="M 65 70 L 75 75 L 65 80" stroke="#3b82f6" strokeWidth="3" fill="none" strokeLinecap="round"/>
+
+          {/* Load Balancer / API Gateway (Cloud) */}
+          <path className="live-draw" style={{animationDelay: '2.5s'}} pathLength="100" d="M 90 85 C 80 85 80 65 95 65 C 95 50 115 50 120 60 C 135 60 135 85 120 85 Z" stroke="currentColor" strokeWidth="3" fill="none" strokeLinejoin="round"/>
+          
+          {/* Arrow 2 (Up to DB) */}
+          <path className="live-draw" style={{animationDelay: '3.5s'}} pathLength="100" d="M 110 60 L 110 40 L 135 40" stroke="#ef4444" strokeWidth="3" fill="none"/>
+          <path className="live-draw" style={{animationDelay: '3.7s'}} pathLength="100" d="M 125 35 L 135 40 L 125 45" stroke="#ef4444" strokeWidth="3" fill="none" strokeLinecap="round"/>
+
+          {/* Database (Cylinder) */}
+          <ellipse className="live-draw" style={{animationDelay: '4s'}} pathLength="100" cx="160" cy="25" rx="20" ry="8" stroke="currentColor" strokeWidth="3" fill="none"/>
+          <path className="live-draw" style={{animationDelay: '4.5s'}} pathLength="100" d="M 140 25 L 140 50 A 20 8 0 0 0 180 50 L 180 25" stroke="currentColor" strokeWidth="3" fill="none"/>
+          <ellipse className="live-draw" style={{animationDelay: '5s'}} pathLength="100" cx="160" cy="35" rx="20" ry="8" stroke="currentColor" strokeWidth="2" strokeDasharray="2 4" fill="none"/>
+
+          {/* Arrow 3 (Down to Server) */}
+          <path className="live-draw" style={{animationDelay: '6s'}} pathLength="100" d="M 110 85 L 110 110 L 135 110" stroke="#10b981" strokeWidth="3" fill="none"/>
+          <path className="live-draw" style={{animationDelay: '6.2s'}} pathLength="100" d="M 125 105 L 135 110 L 125 115" stroke="#10b981" strokeWidth="3" fill="none" strokeLinecap="round"/>
+
+          {/* Server Node (Box) */}
+          <rect className="live-draw" style={{animationDelay: '6.5s'}} pathLength="100" x="140" y="95" width="40" height="30" stroke="currentColor" strokeWidth="3" fill="none"/>
+          <line className="live-draw" style={{animationDelay: '7s'}} pathLength="100" x1="145" y1="105" x2="175" y2="105" stroke="currentColor" strokeWidth="2" fill="none"/>
+          <line className="live-draw" style={{animationDelay: '7.2s'}} pathLength="100" x1="145" y1="115" x2="160" y2="115" stroke="currentColor" strokeWidth="2" fill="none"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+);
+
+const CodingStep = () => {
+  const [codeLines, setCodeLines] = useState<JSX.Element[]>([]);
+  
+  // Real code chunks parsed with faux syntax highlighting
+  const rawCode = [
+    { text: "import", color: "text-purple-400" }, { text: " { WebSocketServer } ", color: "text-gray-300" }, { text: "from", color: "text-purple-400" }, { text: " 'ws';\n\n", color: "text-green-300" },
+    { text: "const", color: "text-purple-400" }, { text: " wss ", color: "text-blue-300" }, { text: "= new", color: "text-purple-400" }, { text: " WebSocketServer({ port: ", color: "text-gray-300" }, { text: "8080", color: "text-orange-400" }, { text: " });\n\n", color: "text-gray-300" },
+    { text: "wss.", color: "text-gray-300" }, { text: "on", color: "text-yellow-200" }, { text: "(", color: "text-gray-300" }, { text: "'connection'", color: "text-green-300" }, { text: ", (ws) => {\n", color: "text-gray-300" },
+    { text: "  console.", color: "text-gray-300" }, { text: "log", color: "text-yellow-200" }, { text: "(", color: "text-gray-300" }, { text: "'Client connected, bridging stream...'", color: "text-green-300" }, { text: ");\n\n", color: "text-gray-300" },
+    { text: "  ws.", color: "text-gray-300" }, { text: "on", color: "text-yellow-200" }, { text: "(", color: "text-gray-300" }, { text: "'message'", color: "text-green-300" }, { text: ", async (data) => {\n", color: "text-gray-300" },
+    { text: "    try {\n", color: "text-purple-400" },
+    { text: "      const", color: "text-purple-400" }, { text: " payload ", color: "text-blue-300" }, { text: "= ", color: "text-gray-300" }, { text: "JSON.", color: "text-blue-200" }, { text: "parse", color: "text-yellow-200" }, { text: "(data);\n", color: "text-gray-300" },
+    { text: "      await", color: "text-purple-400" }, { text: " db.", color: "text-gray-300" }, { text: "execute", color: "text-yellow-200" }, { text: "(payload);\n", color: "text-gray-300" },
+    { text: "    } catch (err) {\n", color: "text-purple-400" },
+    { text: "      ws.", color: "text-gray-300" }, { text: "send", color: "text-yellow-200" }, { text: "(", color: "text-gray-300" }, { text: "'Error: Invalid layout'", color: "text-red-400" }, { text: ");\n", color: "text-gray-300" },
+    { text: "    }\n  });\n});\n", color: "text-gray-300" }
+  ];
+
+  useEffect(() => {
+    let currentLines: JSX.Element[] = [];
+    let chunkIndex = 0;
+    
+    // Varying speeds simulates real human typing bursts
+    const typeChunk = () => {
+      if (chunkIndex >= rawCode.length) return;
+      const chunk = rawCode[chunkIndex];
+      
+      currentLines.push(<span key={chunkIndex} className={chunk.color}>{chunk.text}</span>);
+      setCodeLines([...currentLines]);
+      
+      chunkIndex++;
+      const nextDelay = Math.random() * 150 + 50; // Random delay 50-200ms
+      setTimeout(typeChunk, nextDelay);
+    };
+    
+    setTimeout(typeChunk, 500);
+  }, []);
+
+  return (
+    <div className="w-full h-full bg-[#1e1e1e] font-mono text-xs md:text-sm text-left flex flex-col shadow-inner">
+      {/* IDE Top Bar */}
+      <div className="w-full bg-[#2d2d2d] flex items-center border-b border-black">
+        <div className="px-4 py-1 bg-[#1e1e1e] text-gray-300 border-t-2 border-blue-500 text-[10px] flex items-center gap-2">
+          <span className="text-blue-400 font-bold">TS</span> main.ts
+        </div>
+      </div>
+      
+      {/* IDE Body */}
+      <div className="flex-1 p-3 overflow-hidden relative">
+        <div className="absolute left-0 top-0 bottom-0 w-8 bg-[#1e1e1e] border-r border-[#333] flex flex-col items-end py-3 pr-2 text-[#666] select-none">
+          {Array.from({length: 12}).map((_, i) => <div key={i}>{i+1}</div>)}
+        </div>
+        <div className="ml-8 whitespace-pre-wrap leading-tight break-all">
+          {codeLines}
+          <span className="animate-pulse bg-gray-400 w-2 h-3 inline-block ml-1 align-middle"></span>
+        </div>
+      </div>
+    </div>
+  )
+};
+
+const DebugStep = () => {
+  const [logs, setLogs] = useState<JSX.Element[]>([]);
+  const [isGlitching, setIsGlitching] = useState(false);
+
+  useEffect(() => {
+    const timeline = [
+      { t: 500, elem: <span><span className="text-blue-400">➜</span>  ~ Build started... compiling node modules.</span> },
+      { t: 1800, elem: <span><span className="text-emerald-400">✔</span>  Done in 1.2s.</span> },
+      { t: 2500, elem: <span><span className="text-blue-400">➜</span>  ~ Running unit tests suite (142 tests)...</span> },
+      { t: 4000, elem: <span className="text-red-500 font-bold bg-red-950/50 p-1 w-full block">✖  FATAL: Expected undefined to be a function.</span> },
+      { t: 4200, action: () => setIsGlitching(true) }, // Trigger screen shake
+      { t: 5500, action: () => setIsGlitching(false) },
+      { t: 6000, elem: <span><span className="text-blue-400">➜</span>  ~ Debugger attached. Rewriting async boundary...</span> },
+      { t: 7500, elem: <span><span className="text-blue-400">➜</span>  ~ Hot Module Replacement (HMR) triggered.</span> },
+      { t: 9000, elem: <span className="text-emerald-400 font-bold block mt-2 text-sm md:text-base border-t border-dashed border-emerald-800 pt-2">✨ SUCCESS: 142/142 passed. Server listening on :3000</span> },
+    ];
+
+    const timeouts = timeline.map(({ t, elem, action }) => 
+      setTimeout(() => {
+        if (action) action();
+        if (elem) setLogs(prev => [...prev, elem]);
+      }, t)
+    );
+    return () => timeouts.forEach(clearTimeout);
+  }, []);
+
+  return (
+    <div className={`w-full h-full bg-gray-950 p-4 font-mono text-xs md:text-sm text-gray-300 text-left flex flex-col overflow-hidden relative ${isGlitching ? 'animate-[glitchShake_0.2s_infinite]' : ''}`}>
+      {/* Red flash overlay during error */}
+      <div className={`absolute inset-0 bg-red-500/20 pointer-events-none transition-opacity duration-75 ${isGlitching ? 'opacity-100' : 'opacity-0'}`}></div>
+      
+      {logs.map((log, i) => (
+        <div key={i} className="mb-1">{log}</div>
+      ))}
+      <div className="mt-2 flex items-center">
+        <span className="text-green-500 mr-2">➜</span> <span className="animate-pulse w-2 h-4 bg-gray-400 inline-block"></span>
+      </div>
+    </div>
+  )
+};
+
+const DeployStep = () => (
+  <div className="w-full h-full bg-[#0f172a] relative flex flex-col items-center justify-center overflow-hidden border-[12px] border-[#0f172a]">
+    <div className="absolute top-6 text-white font-sans text-xl md:text-2xl font-black z-20 animate-[pulse_2s_infinite] tracking-[0.3em]">
+      DEPLOYING...
+    </div>
+    
+    <svg className="w-full h-full text-white z-10" viewBox="0 0 200 200">
+      <g style={{ animation: 'rocketLaunch 7s ease-in forwards' }}>
+        {/* Rocket Body (Draws first 2 seconds) */}
+        <path className="live-draw" style={{animationDuration: '2s'}} pathLength="100" d="M 100 40 C 120 70 120 120 120 140 L 80 140 C 80 120 80 70 100 40 Z" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+        {/* Fins */}
+        <path className="live-draw" style={{animationDelay: '1s', animationDuration: '1s'}} pathLength="100" d="M 80 120 L 50 150 L 80 140 M 120 120 L 150 150 L 120 140" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+        {/* Window */}
+        <circle className="live-draw" style={{animationDelay: '1.5s', animationDuration: '0.5s'}} pathLength="100" cx="100" cy="90" r="12" stroke="currentColor" strokeWidth="4" fill="none"/>
+        
+        {/* Fire Flames (Draws at 2.5s, then pulses) */}
+        <path className="live-draw text-orange-500 origin-top animate-[flameFlicker_0.1s_infinite]" style={{animationDelay: '2.5s', animationDuration: '0.5s'}} pathLength="100" d="M 85 140 L 85 170 L 100 190 L 115 170 L 115 140" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+      </g>
+      
+      {/* Smoke Clouds (Left behind as it launches) */}
+      <path className="opacity-0 text-gray-500 animate-[fadeInOut_4s_ease-in-out_3.5s_forwards]" d="M 70 180 Q 50 160 30 190 Q 60 210 90 190" stroke="currentColor" strokeWidth="6" strokeLinecap="round" fill="none"/>
+      <path className="opacity-0 text-gray-500 animate-[fadeInOut_4s_ease-in-out_3.8s_forwards]" d="M 130 180 Q 150 160 170 190 Q 140 210 110 190" stroke="currentColor" strokeWidth="6" strokeLinecap="round" fill="none"/>
+    </svg>
+  </div>
+);
+
+// ==========================================
+// --- MAIN PORTFOLIO COMPONENT ---
+// ==========================================
+
 export default function NotebookPortfolio() {
+  // --- BUILD PIPELINE STATE ---
+  const [buildStep, setBuildStep] = useState(1);
+  const [loopKey, setLoopKey] = useState(0); // Forces re-mount of components on loop
+
+  // Orchestrate the 35-second looping presentation
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (buildStep === 1) timer = setTimeout(() => setBuildStep(2), 10000); // Drawboard
+    else if (buildStep === 2) timer = setTimeout(() => setBuildStep(3), 7000);  // Coding
+    else if (buildStep === 3) timer = setTimeout(() => setBuildStep(4), 11000); // Debugging
+    else if (buildStep === 4) timer = setTimeout(() => {
+      setBuildStep(1);
+      setLoopKey(prev => prev + 1); // Reset animations for next loop
+    }, 7000); // Deploy
+    return () => clearTimeout(timer);
+  }, [buildStep]);
+
   // --- TIC-TAC-TOE AI STATE ---
   const [board, setBoard] = useState(Array(9).fill(null));
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
@@ -88,9 +314,35 @@ export default function NotebookPortfolio() {
       }}
     >
       <style dangerouslySetInnerHTML={{__html: `
-        .live-draw { stroke-dasharray: 100; stroke-dashoffset: 100; animation: drawPath 1.2s ease-out forwards; }
+        .live-draw { stroke-dasharray: 100; stroke-dashoffset: 100; animation: drawPath 1s ease-out forwards; }
         @keyframes drawPath { to { stroke-dashoffset: 0; } }
         html { scroll-behavior: smooth; }
+        
+        /* New Advanced Animations */
+        @keyframes sketchMotion { from { transform: rotate(0deg); } to { transform: rotate(15deg); } }
+        @keyframes glitchShake {
+          0% { transform: translate(1px, 1px) rotate(0deg); filter: hue-rotate(90deg); }
+          20% { transform: translate(-2px, 0px) rotate(-1deg); }
+          40% { transform: translate(2px, -1px) rotate(1deg); }
+          60% { transform: translate(-1px, 2px) rotate(0deg); }
+          80% { transform: translate(2px, -2px) rotate(1deg); }
+          100% { transform: translate(0px, 0px) rotate(0deg); }
+        }
+        @keyframes flameFlicker { 0% { transform: scaleY(1); } 50% { transform: scaleY(1.2); } 100% { transform: scaleY(1); } }
+        @keyframes fadeInOut { 0% { opacity: 0; transform: scale(0.8); } 20% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0; transform: scale(1.5); } }
+        @keyframes rocketLaunch {
+          0% { transform: translateY(0); }
+          40% { transform: translateY(0); }
+          45% { transform: translateY(5px); } /* Rumble down */
+          50% { transform: translateY(-2px); } /* Rumble up */
+          55% { transform: translateY(5px); }
+          60% { transform: translateY(-5px); }
+          100% { transform: translateY(-600px); } /* Blast off */
+        }
+        @keyframes crtScanline {
+          0% { transform: translateY(-100%); }
+          100% { transform: translateY(100vh); }
+        }
       `}} />
 
       {/* --- RANDOM BACKGROUND DOODLES --- */}
@@ -147,7 +399,6 @@ export default function NotebookPortfolio() {
         
         {/* 2. HERO SECTION */}
         <section className="flex flex-col-reverse md:flex-row justify-between items-start gap-12 relative">
-          
           <div className="w-full md:w-[55%]">
             <div className="flex items-end gap-2 mb-6">
               <svg className="w-12 h-12 text-gray-900 pb-1 transform -rotate-6" viewBox="0 0 100 100">
@@ -223,29 +474,21 @@ export default function NotebookPortfolio() {
 
         {/* 3. PROJECTS SECTION */}
         <section id="projects" className="pt-10 scroll-mt-24 relative">
-          
           <div className="relative inline-block mb-10">
             <h2 className="text-4xl font-bold transform -rotate-1">Proof of Work</h2>
             <OrangeUnderline className="-bottom-1" delay="0s" />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
-            
-            {/* Project 1: Cnoize */}
             <div className="relative bg-white p-4 pb-12 border border-gray-200 shadow-[8px_8px_0_0_rgba(0,0,0,0.8)] transform rotate-1 transition-transform hover:-rotate-1">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-yellow-200/80 transform -rotate-2 border border-yellow-300"></div>
-              <div className="aspect-video bg-gray-900 rounded-sm mb-4 flex items-center justify-center text-white border-2 border-black">
-                <img
-                   src="/cnoize.png"
-                   alt="cnoize Tarding app Interface"
-                   className="w-full h-full object=cover"
-                   />
+              <div className="aspect-video bg-gray-900 rounded-sm mb-4 flex items-center justify-center text-white border-2 border-black overflow-hidden">
+                <img src="/cnoize.png" alt="Cnoize Trading App Interface" className="w-full h-full object-cover" />
               </div>
               <h3 className="text-3xl font-bold mb-2">Cnoize Trading App</h3>
               <p className="text-xl text-gray-700 leading-tight">Kotlin/Jetpack Compose UI powered by real-time WebSockets and Upstash Redis.</p>
             </div>
 
-            {/* Project 2: Agentic Workflow */}
             <div className="relative bg-white p-4 pb-12 border border-gray-200 shadow-[8px_8px_0_0_rgba(0,0,0,0.8)] transform -rotate-2 transition-transform hover:rotate-1">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-yellow-200/80 transform rotate-3 border border-yellow-300"></div>
               <div className="aspect-video bg-blue-900 rounded-sm mb-4 flex items-center justify-center text-white border-2 border-black">
@@ -255,42 +498,66 @@ export default function NotebookPortfolio() {
               <p className="text-xl text-gray-700 leading-tight">Zero-hallucination data extraction tool using custom Python LLM orchestration.</p>
             </div>
 
-            {/* Project 3: Native Storefront */}
             <div className="relative bg-white p-4 pb-12 border border-gray-200 shadow-[8px_8px_0_0_rgba(0,0,0,0.8)] transform rotate-2 transition-transform hover:-rotate-1">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-red-200/80 transform -rotate-1 border border-red-300"></div>
               <div className="aspect-video bg-emerald-900 rounded-sm mb-4 flex items-center justify-center text-white border-2 border-black">
                 <span className="font-mono text-xs md:text-sm opacity-50">REACT_NATIVE_STOREFRONT</span>
               </div>
               <h3 className="text-3xl font-bold mb-2">Mobile Storefront</h3>
-              <p className="text-xl text-gray-700 leading-tight">Cross-platform e-commerce app built in a React Native environment. Optimized for native-like performance and scalability.</p>
+              <p className="text-xl text-gray-700 leading-tight">Cross-platform e-commerce app built in a React Native environment. Optimized for scalability.</p>
             </div>
-
           </div>
         </section>
 
-        {/* 4. PROCESS / PIPELINE SECTION */}
-        <section className="pt-10 relative">
+        {/* 4. THE RETRO COMPUTER PIPELINE SECTION */}
+        <section className="pt-16 pb-10 relative">
           <div className="relative inline-block mb-10">
             <h2 className="text-4xl font-bold transform -rotate-1">How it gets built</h2>
             <CyanSquiggle className="-bottom-2" delay="0s" />
           </div>
 
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            {['Drawboard Scope', 'Integration Logic', 'Hostile Debugging', 'Ship to Prod'].map((step, i) => (
-              <React.Fragment key={step}>
-                <div className={`flex flex-col items-center transform ${i % 2 === 0 ? 'rotate-2' : '-rotate-2'}`}>
-                  <div className="w-16 h-16 rounded-full border-2 border-black bg-white flex items-center justify-center text-2xl font-bold shadow-[4px_4px_0_0_rgba(0,0,0,1)] mb-2">
-                    {i + 1}
-                  </div>
-                  <h4 className="text-2xl font-bold text-center">{step}</h4>
+          <div className="w-full max-w-4xl mx-auto flex flex-col items-center">
+            {/* Monitor Body */}
+            <div className="w-full bg-[#e2e8f0] border-4 border-black rounded-[2rem] p-4 md:p-8 shadow-[12px_12px_0_0_rgba(0,0,0,1)] relative z-10">
+              
+              {/* Screen Bezel */}
+              <div className="w-full aspect-[1.1/1] md:aspect-[1.8/1] bg-[#cbd5e1] border-4 border-black rounded-2xl p-3 md:p-5 shadow-inner relative">
+                
+                {/* Glass Screen */}
+                <div className="w-full h-full bg-gray-950 border-4 border-black rounded-xl overflow-hidden relative shadow-[inset_0_0_30px_rgba(0,0,0,1)] flex items-center justify-center">
+                  
+                  {/* Key forces remount/re-animation of components */}
+                  <React.Fragment key={loopKey}>
+                    {buildStep === 1 && <DrawboardStep />}
+                    {buildStep === 2 && <CodingStep />}
+                    {buildStep === 3 && <DebugStep />}
+                    {buildStep === 4 && <DeployStep />}
+                  </React.Fragment>
+
+                  {/* Retro CRT Scanline Overlay */}
+                  <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:100%_4px]"></div>
+                  <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-white/5 to-transparent h-[10%] opacity-50 animate-[crtScanline_6s_linear_infinite]"></div>
                 </div>
-                {i < 3 && (
-                  <svg className="hidden md:block w-16 h-8 text-gray-400" viewBox="0 0 100 50">
-                    <path d="M 0 25 Q 50 -10 100 25 M 85 15 L 100 25 L 85 35" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round"/>
-                  </svg>
-                )}
-              </React.Fragment>
-            ))}
+              </div>
+              
+              {/* Monitor Dashboard */}
+              <div className="flex flex-col md:flex-row justify-between items-center mt-6 px-2 gap-4">
+                <div className="flex gap-2 md:gap-4 items-center">
+                   <div className={`px-2 md:px-3 py-1 rounded font-mono text-[10px] md:text-xs font-bold transition-colors ${buildStep === 1 ? 'bg-blue-600 text-white' : 'text-gray-500'}`}>1.PLAN</div>
+                   <div className={`px-2 md:px-3 py-1 rounded font-mono text-[10px] md:text-xs font-bold transition-colors ${buildStep === 2 ? 'bg-blue-600 text-white' : 'text-gray-500'}`}>2.CODE</div>
+                   <div className={`px-2 md:px-3 py-1 rounded font-mono text-[10px] md:text-xs font-bold transition-colors ${buildStep === 3 ? 'bg-blue-600 text-white' : 'text-gray-500'}`}>3.DEBUG</div>
+                   <div className={`px-2 md:px-3 py-1 rounded font-mono text-[10px] md:text-xs font-bold transition-colors ${buildStep === 4 ? 'bg-emerald-600 text-white' : 'text-gray-500'}`}>4.SHIP</div>
+                </div>
+                <div className="flex gap-4 items-center">
+                  <div className="text-xs font-bold font-mono text-gray-400 hidden md:block">SYS_V.1.0</div>
+                  <div className={`w-4 h-4 rounded-full border-2 border-black transition-colors ${buildStep === 3 ? 'bg-red-500 animate-none shadow-[0_0_10px_rgba(239,68,68,0.8)]' : 'bg-green-500 animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.8)]'}`}></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Stand Base */}
+            <div className="w-24 md:w-32 h-8 md:h-12 bg-[#cbd5e1] border-x-4 border-black relative z-0 -mt-2"></div>
+            <div className="w-48 md:w-64 h-6 bg-[#94a3b8] border-4 border-black rounded-t-xl shadow-[8px_8px_0_0_rgba(0,0,0,1)] relative z-0"></div>
           </div>
         </section>
 
