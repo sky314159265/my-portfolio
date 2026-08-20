@@ -68,41 +68,43 @@ export default function CnoizeProjectPage() {
           </div>
 
           <div className="p-6 border-4 border-black bg-white shadow-[8px_8px_0_0_rgba(0,0,0,1)] transform rotate-1 relative">
-             <svg className="absolute -top-6 -right-6 w-12 h-12 text-red-500 transform rotate-12" viewBox="0 0 100 100">
+             <svg className="absolute -top-6 -right-6 w-12 h-12 text-emerald-500 transform rotate-12" viewBox="0 0 100 100">
                 <path d="M 50 10 L 60 40 L 90 50 L 60 60 L 50 90 L 40 60 L 10 50 L 40 40 Z" fill="currentColor"/>
             </svg>
-            <h3 className="text-3xl font-bold mb-2">Interact with the real APK 👉</h3>
+            <h3 className="text-3xl font-bold mb-2">See it in action 👉</h3>
             <p className="text-2xl text-gray-700">
-              Don't take my word for it. Use the embedded Android emulator on the right to install and play with the actual compiled application live in your browser.
+              Watch the raw APK executing live trades via WebSockets with sub-100ms latency. The Jetpack Compose UI remains butter-smooth during heavy data loads.
             </p>
           </div>
         </div>
 
-        {/* Right Side: The REAL APK Emulator (via Appetize.io) */}
+        {/* Right Side: The Video Player Emulator */}
         <div className="w-full lg:w-1/2 flex justify-center lg:justify-end">
-          <div className="relative bg-white p-6 pb-20 shadow-[20px_20px_0_0_rgba(0,0,0,0.8)] border-2 border-black transform rotate-2 max-w-[380px] w-full">
+          <div className="relative bg-white p-6 pb-20 shadow-[20px_20px_0_0_rgba(0,0,0,0.8)] border-2 border-black transform rotate-2 max-w-[350px] w-full">
             {/* Sticky Tape */}
             <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-40 h-10 bg-yellow-100/90 transform -rotate-3 border border-yellow-300 shadow-sm z-30"></div>
 
             {/* The Phone Bezel Wrapper */}
-            <div className="relative w-full aspect-[9/19] bg-black rounded-[3rem] border-[8px] border-gray-800 overflow-hidden shadow-inner flex items-center justify-center p-1">
+            <div className="relative w-full aspect-[9/19] bg-black rounded-[3rem] border-[8px] border-gray-800 overflow-hidden shadow-inner flex flex-col font-sans text-white">
               
-              {/* User's Exact Appetize URL with screenOnly=true so it fits our hand-drawn aesthetic */}
-              <iframe 
-                src="https://appetize.io/embed/b_kyytcwj2ytv77xo5jaj6gcwyxe?auth=demo_visitor:911234567890&autoplay=false&scale=auto&screenOnly=true" 
-                width="100%" 
-                height="100%" 
-                frameBorder="0" 
-                scrolling="no"
-                className="w-full h-full rounded-[2.5rem]"
-                style={{ border: 'none' }}
-              ></iframe>
+              {/* Camera Notch overlay to make it look like a real phone */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-black rounded-b-2xl z-20"></div>
+
+              {/* THE VIDEO ELEMENT */}
+              <video 
+                src="/cnoize-demo.mp4"
+                autoPlay 
+                loop 
+                muted 
+                playsInline 
+                className="w-full h-full object-cover rounded-[2.5rem]"
+              />
 
             </div>
             
             {/* Handwritten Label */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-3xl text-black font-bold transform -rotate-1 whitespace-nowrap">
-              "Live Android Emulator"
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-3xl text-black font-bold transform -rotate-1 whitespace-nowrap pointer-events-none">
+              "Live Build Recording"
             </div>
           </div>
         </div>
