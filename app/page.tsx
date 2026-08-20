@@ -13,7 +13,6 @@ const penFont = Caveat({
 // ==========================================
 // --- CUSTOM HOOK: SCROLL TRIGGER ---
 // ==========================================
-// This forces elements to wait until they are visible on the screen to animate.
 function useScrollReveal(threshold = 0.15) {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLElement | null>(null);
@@ -23,7 +22,6 @@ function useScrollReveal(threshold = 0.15) {
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
-          // Stop observing once it has triggered so it doesn't reset constantly
           if (ref.current) observer.unobserve(ref.current);
         }
       },
@@ -48,22 +46,38 @@ const RevealSection = ({ children, className = "", id = "", as: Component = "sec
   );
 };
 
-const OrangeUnderline = ({ className = "", delay = "0s" }) => (
+const OrangeUnderline = ({ className = "" }) => (
   <svg className={`absolute w-full h-3 text-[#ff5e00] pointer-events-none ${className}`} viewBox="0 0 200 20" preserveAspectRatio="none">
-    <path className="live-draw" style={{ animationDelay: delay }} pathLength="100" d="M 2 12 Q 50 8 100 12 T 198 10" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" />
+    <path 
+      className="transition-all duration-500 ease-out [stroke-dasharray:105] [stroke-dashoffset:105] group-hover:[stroke-dashoffset:0] group-active:[stroke-dashoffset:0]" 
+      pathLength="100" 
+      d="M 2 12 Q 50 8 100 12 T 198 10" 
+      stroke="currentColor" 
+      strokeWidth="4" 
+      fill="none" 
+      strokeLinecap="round" 
+    />
   </svg>
 );
 
-const CyanSquiggle = ({ className = "", delay = "0s" }) => (
+const CyanSquiggle = ({ className = "" }) => (
   <svg className={`absolute w-full h-3 text-[#06b6d4] pointer-events-none ${className}`} viewBox="0 0 300 20" preserveAspectRatio="none">
-    <path className="live-draw" style={{ animationDelay: delay }} pathLength="100" d="M 0 10 L 15 2 L 30 15 L 45 2 L 60 15 L 75 2 L 90 15 L 105 2 L 120 15 L 135 2 L 150 15 L 165 2 L 180 15 L 195 2 L 210 15 L 225 2 L 240 15 L 255 2 L 270 15 L 285 2 L 300 10" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+    <path 
+      className="transition-all duration-500 ease-out [stroke-dasharray:105] [stroke-dashoffset:105] group-hover:[stroke-dashoffset:0] group-active:[stroke-dashoffset:0]" 
+      pathLength="100" 
+      d="M 0 10 L 15 2 L 30 15 L 45 2 L 60 15 L 75 2 L 90 15 L 105 2 L 120 15 L 135 2 L 150 15 L 165 2 L 180 15 L 195 2 L 210 15 L 225 2 L 240 15 L 255 2 L 270 15 L 285 2 L 300 10" 
+      stroke="currentColor" 
+      strokeWidth="3" 
+      fill="none" 
+      strokeLinecap="round" 
+      strokeLinejoin="round"
+    />
   </svg>
 );
 
 // ==========================================
 // --- PIPELINE SUB-COMPONENTS ---
 // ==========================================
-
 const DrawboardStep = () => (
   <div className="w-full h-full bg-[#0f172a] relative flex flex-col items-center justify-center overflow-hidden font-mono shadow-[inset_0_0_40px_rgba(0,0,0,0.8)]">
     <div className="absolute inset-0 opacity-20 bg-[linear-gradient(to_right,#334155_1px,transparent_1px),linear-gradient(to_bottom,#334155_1px,transparent_1px)] bg-[size:20px_20px]"></div>
@@ -219,10 +233,8 @@ export default function NotebookPortfolio() {
   const [buildStep, setBuildStep] = useState(1);
   const [loopKey, setLoopKey] = useState(0); 
 
-  // Use our custom hook to check if the computer is on screen (Wait until 30% visible)
   const [monitorRef, isMonitorVisible] = useScrollReveal(0.3);
 
-  // The 35-sec loop ONLY runs if isMonitorVisible is true!
   useEffect(() => {
     if (!isMonitorVisible) return;
 
@@ -237,15 +249,16 @@ export default function NotebookPortfolio() {
     return () => clearTimeout(timer);
   }, [buildStep, isMonitorVisible]);
 
-  // --- TIC-TAC-TOE AI STATE ---
+  // --- SMART TIC-TAC-TOE AI STATE ---
   const [board, setBoard] = useState(Array(9).fill(null));
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
   const [winningLine, setWinningLine] = useState<string | null>(null);
 
+  // Curved, hand-drawn winning paths
   const winningCombinations = [
-    [0, 1, 2, "M 5 16 L 95 16"], [3, 4, 5, "M 5 50 L 95 50"], [6, 7, 8, "M 5 84 L 95 84"],
-    [0, 3, 6, "M 16 5 L 16 95"], [1, 4, 7, "M 50 5 L 50 95"], [2, 5, 8, "M 84 5 L 84 95"],
-    [0, 4, 8, "M 5 5 L 95 95"],  [2, 4, 6, "M 95 5 L 5 95"]
+    [0, 1, 2, "M 5 16 Q 50 14 95 18"], [3, 4, 5, "M 5 50 Q 50 52 95 48"], [6, 7, 8, "M 5 84 Q 50 86 95 82"],
+    [0, 3, 6, "M 16 5 Q 14 50 18 95"], [1, 4, 7, "M 50 5 Q 52 50 48 95"], [2, 5, 8, "M 84 5 Q 86 50 82 95"],
+    [0, 4, 8, "M 5 5 Q 50 55 95 95"],  [2, 4, 6, "M 95 5 Q 50 45 5 95"]
   ];
 
   const handlePlayerMove = (i: number) => {
@@ -272,18 +285,54 @@ export default function NotebookPortfolio() {
       setWinningLine(status.path);
       return;
     }
+
     if (!isPlayerTurn && board.includes(null)) {
       const timer = setTimeout(() => {
         const newBoard = [...board];
-        const emptyIndices = newBoard.map((v, i) => v === null ? i : null).filter(v => v !== null) as number[];
-        const randomMove = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
-        newBoard[randomMove] = 'O';
+        let aiMove = -1;
+
+        // AI LOGIC 1: Take winning move
+        for (let i = 0; i < winningCombinations.length; i++) {
+          const [a, b, c] = winningCombinations[i];
+          if (newBoard[a as number] === 'O' && newBoard[b as number] === 'O' && !newBoard[c as number]) { aiMove = c as number; break; }
+          if (newBoard[a as number] === 'O' && newBoard[c as number] === 'O' && !newBoard[b as number]) { aiMove = b as number; break; }
+          if (newBoard[b as number] === 'O' && newBoard[c as number] === 'O' && !newBoard[a as number]) { aiMove = a as number; break; }
+        }
+
+        // AI LOGIC 2: Block player win
+        if (aiMove === -1) {
+          for (let i = 0; i < winningCombinations.length; i++) {
+            const [a, b, c] = winningCombinations[i];
+            if (newBoard[a as number] === 'X' && newBoard[b as number] === 'X' && !newBoard[c as number]) { aiMove = c as number; break; }
+            if (newBoard[a as number] === 'X' && newBoard[c as number] === 'X' && !newBoard[b as number]) { aiMove = b as number; break; }
+            if (newBoard[b as number] === 'X' && newBoard[c as number] === 'X' && !newBoard[a as number]) { aiMove = a as number; break; }
+          }
+        }
+
+        // AI LOGIC 3: Take center
+        if (aiMove === -1 && !newBoard[4]) {
+          aiMove = 4;
+        }
+
+        // AI LOGIC 4: Take corner
+        if (aiMove === -1) {
+          const corners = [0, 2, 6, 8].filter(i => !newBoard[i]);
+          if (corners.length > 0) aiMove = corners[Math.floor(Math.random() * corners.length)];
+        }
+
+        // AI LOGIC 5: Random empty square
+        if (aiMove === -1) {
+          const emptyIndices = newBoard.map((v, i) => v === null ? i : null).filter(v => v !== null) as number[];
+          aiMove = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+        }
+
+        newBoard[aiMove] = 'O';
         setBoard(newBoard);
         setIsPlayerTurn(true);
-      }, 500);
+      }, 700); // 700ms makes it feel like it's actually thinking
       return () => clearTimeout(timer);
     }
-  }, [isPlayerTurn, board]);
+  }, [isPlayerTurn, board, winningCombinations]);
 
   const resetGame = () => {
     setBoard(Array(9).fill(null));
@@ -301,7 +350,7 @@ export default function NotebookPortfolio() {
         backgroundPosition: 'center top'
       }}
     >
-      {/* GLOBAL CSS: Notice the .is-visible prefix. Elements only draw when scrolled to! */}
+      {/* GLOBAL CSS */}
       <style dangerouslySetInnerHTML={{__html: `
         .live-draw { stroke-dasharray: 100; stroke-dashoffset: 100; }
         .is-visible .live-draw { 
@@ -353,13 +402,13 @@ export default function NotebookPortfolio() {
         <path d="M 20 20 L 25 35 L 40 40 L 25 45 L 20 60 L 15 45 L 0 40 L 15 35 Z" fill="currentColor" transform="scale(0.5) translate(120, -50)"/>
       </svg>
 
-      {/* 1. HEADER (Wrapped in RevealSection) */}
+      {/* 1. HEADER */}
       <RevealSection as="header" className="pt-8 px-6 md:px-12 w-full max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 pb-6 mb-8 relative z-10">
-        <div className="relative inline-block transform -rotate-2">
+        <div className="relative inline-block transform -rotate-2 group cursor-default">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight">
             Hi, I'm sky!
           </h1>
-          <OrangeUnderline className="-bottom-1 left-0" delay="0.2s" />
+          <OrangeUnderline className="-bottom-1 left-0" />
         </div>
 
         <nav className="flex justify-center gap-6 md:gap-12">
@@ -371,14 +420,14 @@ export default function NotebookPortfolio() {
               <circle className="live-draw" style={{animationDelay: '0.8s'}} pathLength="100" cx="75" cy="20" r="5" stroke="currentColor" strokeWidth="4" fill="none"/>
             </svg>
             <span className="text-2xl font-bold transform -rotate-1">Projects</span>
-            <OrangeUnderline className="-bottom-1" delay="0.9s" />
+            <OrangeUnderline className="-bottom-1" />
           </a>
           <a href="#contact" className="flex flex-col items-center relative group cursor-pointer hover:-translate-y-1 transition-transform">
             <svg className="w-8 h-8 md:w-10 md:h-10 text-gray-900 mb-1" viewBox="0 0 100 100">
               <path className="live-draw" style={{animationDelay: '0.6s'}} pathLength="100" d="M 10 60 L 90 20 L 60 90 L 50 65 Z M 90 20 L 50 65 M 40 60 L 50 65 L 45 85 Z" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
             <span className="text-2xl font-bold transform -rotate-1">Contact</span>
-            <OrangeUnderline className="-bottom-1" delay="1.1s" />
+            <OrangeUnderline className="-bottom-1" />
           </a>
           <a href="#testimonials" className="flex flex-col items-center relative group cursor-pointer hover:-translate-y-1 transition-transform">
             <svg className="w-8 h-8 md:w-10 md:h-10 text-gray-900 mb-1" viewBox="0 0 100 100">
@@ -386,7 +435,7 @@ export default function NotebookPortfolio() {
               <path className="live-draw" style={{animationDelay: '1s'}} pathLength="100" d="M 35 45 L 55 45 M 35 55 L 45 55" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round"/>
             </svg>
             <span className="text-2xl font-bold transform -rotate-1">Testimonials</span>
-            <OrangeUnderline className="-bottom-1" delay="1.3s" />
+            <OrangeUnderline className="-bottom-1" />
           </a>
         </nav>
       </RevealSection>
@@ -407,9 +456,9 @@ export default function NotebookPortfolio() {
                 <path className="live-draw" style={{animationDelay: '1.5s'}} pathLength="100" d="M 35 70 C 20 60 20 35 50 35 C 80 35 80 60 65 70 L 65 80 L 35 80 Z" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
                 <path className="live-draw" style={{animationDelay: '1.7s'}} pathLength="100" d="M 40 85 L 60 85 M 40 90 L 60 90 M 45 95 L 55 95" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round"/>
               </svg>
-              <div className="relative mb-1">
+              <div className="relative mb-1 group cursor-default">
                 <h2 className="text-3xl md:text-4xl font-bold tracking-tight transform -rotate-1">What i Actually do :</h2>
-                <CyanSquiggle className="-bottom-2 left-0" delay="2.1s" />
+                <CyanSquiggle className="-bottom-2 left-0" />
               </div>
             </div>
             
@@ -430,29 +479,33 @@ export default function NotebookPortfolio() {
           </div>
 
           <div className="w-full md:w-[45%] flex flex-col justify-center items-center relative">
-            <div className="relative w-56 h-56 md:w-72 md:h-72 transform -rotate-4 transition-transform hover:-rotate-2">
+            {/* TIGHTER, LESS BROAD CONTAINER: w-48 to md:w-60 */}
+            <div className="relative w-48 h-48 md:w-60 md:h-60 transform -rotate-4 transition-transform hover:-rotate-2">
               <svg className="absolute inset-0 w-full h-full text-black pointer-events-none z-0" viewBox="0 0 100 100">
-                <path className="live-draw" style={{animationDelay: '1s'}} pathLength="100" d="M 33 5 L 35 95 M 66 2 L 64 98 M 2 33 L 98 35 M 5 66 L 95 64" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round"/>
+                {/* Hand-drawn squiggly board lines instead of perfectly straight ones */}
+                <path className="live-draw" style={{animationDelay: '1s'}} pathLength="100" d="M 33 5 Q 35 50 32 95 M 66 2 Q 64 50 67 98 M 2 33 Q 50 35 98 32 M 5 66 Q 50 64 95 67" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round"/>
                 {winningLine && <path className="live-draw text-black" pathLength="100" d={winningLine} stroke="currentColor" strokeWidth="8" fill="none" strokeLinecap="round"/>}
               </svg>
-              <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 z-10">
+              <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 z-10 p-1">
                 {board.map((cell, i) => (
                   <div key={i} onClick={() => handlePlayerMove(i)} className="w-full h-full flex items-center justify-center cursor-pointer hover:bg-black/5 rounded-md">
                     {cell === 'X' && (
                       <svg className="w-12 h-12 text-black" viewBox="0 0 100 100">
-                        <path className="live-draw" pathLength="100" d="M 15 15 L 85 85 M 85 15 L 15 85" stroke="currentColor" strokeWidth="6" fill="none" strokeLinecap="round"/>
+                        {/* Hand-drawn X with Bezier curves */}
+                        <path className="live-draw" pathLength="100" d="M 22 22 Q 50 45 78 78 M 78 22 Q 50 55 22 78" stroke="currentColor" strokeWidth="5" fill="none" strokeLinecap="round"/>
                       </svg>
                     )}
                     {cell === 'O' && (
                       <svg className="w-12 h-12 text-black" viewBox="0 0 100 100">
-                        <circle className="live-draw" pathLength="100" cx="50" cy="50" r="35" stroke="currentColor" strokeWidth="6" fill="none"/>
+                        {/* Hand-drawn organic circle */}
+                        <path className="live-draw" pathLength="100" d="M 50 15 C 25 15 15 40 20 65 C 25 85 50 90 75 75 C 90 60 85 25 60 15 C 55 12 45 15 45 15" stroke="currentColor" strokeWidth="5" fill="none" strokeLinecap="round"/>
                       </svg>
                     )}
                   </div>
                 ))}
               </div>
             </div>
-            <div className="h-10 mt-4">
+            <div className="h-10 mt-6">
               {(winningLine || !board.includes(null)) ? (
                 <button onClick={resetGame} className="text-xl font-bold border-2 border-black px-4 py-1 transform rotate-2 hover:bg-black hover:text-white transition-all bg-white shadow-sm">
                   Play Again ✏️
@@ -472,17 +525,16 @@ export default function NotebookPortfolio() {
             <path className="live-draw" d="M 10 30 Q 30 10 50 30 T 90 30 M 15 50 Q 40 30 60 50 T 85 50 M 20 70 Q 50 50 70 70" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/>
           </svg>
 
-          <div className="relative inline-block mb-10">
+          <div className="relative inline-block mb-10 group cursor-default">
             <h2 className="text-4xl font-bold transform -rotate-1">Proof of Work</h2>
-            <OrangeUnderline className="-bottom-1" delay="0s" />
+            <OrangeUnderline className="-bottom-1" />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
             
-            {/* Project 1: Cnoize (LINK TO LIVE EMULATOR) */}
-            <Link href="/projects/cnoize" className="block relative bg-white p-4 pb-12 border border-gray-200 shadow-[8px_8px_0_0_rgba(0,0,0,0.8)] transform rotate-1 transition-transform hover:-rotate-1 cursor-pointer group">
-              {/* Try Live App Badge */}
-              <div className="absolute -right-4 -top-4 bg-red-500 text-white font-bold px-3 py-1 text-sm transform rotate-12 opacity-0 group-hover:opacity-100 transition-opacity z-40 rounded-sm">
+            {/* Project 1: Cnoize */}
+            <Link href="/projects/cnoize" className="block relative bg-white p-4 pb-12 border border-gray-200 shadow-[8px_8px_0_0_rgba(0,0,0,0.8)] transform rotate-1 transition-transform hover:-rotate-1 cursor-pointer group/card">
+              <div className="absolute -right-4 -top-4 bg-red-500 text-white font-bold px-3 py-1 text-sm transform rotate-12 opacity-0 group-hover/card:opacity-100 transition-opacity z-40 rounded-sm">
                 Try Live App!
               </div>
               
@@ -490,7 +542,7 @@ export default function NotebookPortfolio() {
               <div className="aspect-video bg-gray-900 rounded-sm mb-4 flex items-center justify-center text-white border-2 border-black overflow-hidden">
                 <img src="/cnoize.png" alt="Cnoize Trading App Interface" className="w-full h-full object-cover" />
               </div>
-              <h3 className="text-3xl font-bold mb-2 group-hover:text-blue-600 transition-colors">Cnoize Trading App</h3>
+              <h3 className="text-3xl font-bold mb-2 group-hover/card:text-blue-600 transition-colors">Cnoize Trading App</h3>
               <p className="text-xl text-gray-700 leading-tight">Kotlin/Jetpack Compose UI powered by real-time WebSockets and Upstash Redis.</p>
             </Link>
 
@@ -518,9 +570,10 @@ export default function NotebookPortfolio() {
 
         {/* 4. THE RETRO COMPUTER PIPELINE SECTION */}
         <RevealSection className="pt-16 pb-10 relative">
-          <div className="relative inline-block mb-10">
+          
+          <div className="relative inline-block mb-10 group cursor-default">
             <h2 className="text-4xl font-bold transform -rotate-1">How it gets built</h2>
-            <CyanSquiggle className="-bottom-2" delay="0s" />
+            <CyanSquiggle className="-bottom-2" />
           </div>
 
           <div ref={monitorRef as any} className="w-full max-w-4xl mx-auto flex flex-col items-center">
@@ -566,9 +619,9 @@ export default function NotebookPortfolio() {
             <path className="live-draw" style={{animationDelay: '0.3s'}} d="M 20 20 L 25 35 L 40 40 L 25 45 L 20 60 L 15 45 L 0 40 L 15 35 Z" fill="currentColor" transform="scale(0.5) translate(120, -50)"/>
           </svg>
 
-          <div className="relative inline-block mb-10">
+          <div className="relative inline-block mb-10 group cursor-default">
             <h2 className="text-4xl font-bold transform -rotate-1">Word on the street</h2>
-            <OrangeUnderline className="-bottom-1" delay="0s" />
+            <OrangeUnderline className="-bottom-1" />
           </div>
           
           <div className="flex flex-col md:flex-row gap-8">
