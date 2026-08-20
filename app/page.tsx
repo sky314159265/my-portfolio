@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import React, { useState, useEffect, useRef } from 'react';
 import { Caveat } from 'next/font/google';
 
 const penFont = Caveat({ 
@@ -9,7 +10,44 @@ const penFont = Caveat({
   display: 'swap',
 });
 
-// --- REUSABLE SVG COMPONENTS ---
+// ==========================================
+// --- CUSTOM HOOK: SCROLL TRIGGER ---
+// ==========================================
+// This forces elements to wait until they are visible on the screen to animate.
+function useScrollReveal(threshold = 0.15) {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          // Stop observing once it has triggered so it doesn't reset constantly
+          if (ref.current) observer.unobserve(ref.current);
+        }
+      },
+      { threshold, rootMargin: "0px 0px -50px 0px" } 
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [threshold]);
+
+  return [ref, isVisible] as const;
+}
+
+// ==========================================
+// --- REUSABLE COMPONENTS ---
+// ==========================================
+const RevealSection = ({ children, className = "", id = "", as: Component = "section" }: any) => {
+  const [ref, isVisible] = useScrollReveal();
+  return (
+    <Component id={id} ref={ref} className={`${className} ${isVisible ? 'is-visible' : ''}`}>
+      {children}
+    </Component>
+  );
+};
+
 const OrangeUnderline = ({ className = "", delay = "0s" }) => (
   <svg className={`absolute w-full h-3 text-[#ff5e00] pointer-events-none ${className}`} viewBox="0 0 200 20" preserveAspectRatio="none">
     <path className="live-draw" style={{ animationDelay: delay }} pathLength="100" d="M 2 12 Q 50 8 100 12 T 198 10" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" />
@@ -23,66 +61,49 @@ const CyanSquiggle = ({ className = "", delay = "0s" }) => (
 );
 
 // ==========================================
-// --- ADVANCED PIPELINE SUB-COMPONENTS ---
+// --- PIPELINE SUB-COMPONENTS ---
 // ==========================================
 
 const DrawboardStep = () => (
   <div className="w-full h-full bg-[#0f172a] relative flex flex-col items-center justify-center overflow-hidden font-mono shadow-[inset_0_0_40px_rgba(0,0,0,0.8)]">
-    
-    {/* Blueprint Grid Background */}
     <div className="absolute inset-0 opacity-20 bg-[linear-gradient(to_right,#334155_1px,transparent_1px),linear-gradient(to_bottom,#334155_1px,transparent_1px)] bg-[size:20px_20px]"></div>
-    
     <h3 className="absolute top-4 left-4 text-emerald-400 text-xs md:text-sm font-bold tracking-widest z-20 animate-pulse">
       SYSTEM_ARCHITECTURE_MAP
     </h3>
     
     <div className="relative w-full h-full flex items-center justify-center p-2 z-10">
       <svg className="w-full h-full md:w-[90%] md:h-[90%] text-slate-300" viewBox="0 0 400 250">
-        
-        {/* Animated Data Streams */}
         <path className="animate-[dashMove_1s_linear_infinite]" style={{animationDelay: '3s', opacity: 0, animationFillMode: 'forwards'}} d="M 70 125 L 130 125" stroke="#3b82f6" strokeWidth="2" strokeDasharray="4 4" fill="none"/>
         <path className="animate-[dashMove_1s_linear_infinite]" style={{animationDelay: '4.5s', opacity: 0, animationFillMode: 'forwards'}} d="M 170 105 L 230 65" stroke="#10b981" strokeWidth="2" strokeDasharray="4 4" fill="none"/>
         <path className="animate-[dashMove_1s_linear_infinite]" style={{animationDelay: '5s', opacity: 0, animationFillMode: 'forwards'}} d="M 170 145 L 230 185" stroke="#ef4444" strokeWidth="2" strokeDasharray="4 4" fill="none"/>
         <path className="animate-[dashMove_1s_linear_infinite]" style={{animationDelay: '6.5s', opacity: 0, animationFillMode: 'forwards'}} d="M 270 185 L 330 125" stroke="#eab308" strokeWidth="2" strokeDasharray="4 4" fill="none"/>
 
-        {/* NODE 1: CLIENT */}
         <rect className="live-draw" style={{animationDelay: '0.5s'}} pathLength="100" x="20" y="100" width="50" height="50" rx="8" stroke="currentColor" strokeWidth="3" fill="#1e293b"/>
         <text x="45" y="130" className="text-[10px] fill-white opacity-0" style={{animation: 'fadeInText 0.5s forwards 1s'}} textAnchor="middle">APP</text>
 
-        {/* CONNECTION 1 */}
         <path className="live-draw" style={{animationDelay: '1.5s'}} pathLength="100" d="M 70 125 L 130 125" stroke="currentColor" strokeWidth="3" fill="none"/>
-
-        {/* NODE 2: API GATEWAY */}
         <path className="live-draw" style={{animationDelay: '2s'}} pathLength="100" d="M 150 95 L 170 125 L 150 155 L 130 125 Z" stroke="#3b82f6" strokeWidth="3" fill="#1e293b"/>
         <text x="150" y="170" className="text-[8px] fill-blue-400 opacity-0" style={{animation: 'fadeInText 0.5s forwards 2.5s'}} textAnchor="middle">API_GATEWAY</text>
 
-        {/* CONNECTIONS OUT OF GATEWAY */}
         <path className="live-draw" style={{animationDelay: '3s'}} pathLength="100" d="M 170 105 L 230 65" stroke="currentColor" strokeWidth="3" fill="none"/>
         <path className="live-draw" style={{animationDelay: '3.5s'}} pathLength="100" d="M 170 145 L 230 185" stroke="currentColor" strokeWidth="3" fill="none"/>
 
-        {/* NODE 3: AUTH SERVICE */}
         <rect className="live-draw" style={{animationDelay: '4s'}} pathLength="100" x="230" y="40" width="60" height="40" rx="4" stroke="#10b981" strokeWidth="3" fill="#1e293b"/>
         <text x="260" y="63" className="text-[10px] fill-emerald-400 opacity-0" style={{animation: 'fadeInText 0.5s forwards 4.5s'}} textAnchor="middle">AUTH</text>
 
-        {/* NODE 4: WEBSOCKETS */}
         <rect className="live-draw" style={{animationDelay: '4.5s'}} pathLength="100" x="230" y="165" width="60" height="40" rx="4" stroke="#ef4444" strokeWidth="3" fill="#1e293b"/>
         <text x="260" y="188" className="text-[10px] fill-red-400 opacity-0" style={{animation: 'fadeInText 0.5s forwards 5s'}} textAnchor="middle">WSS_NODE</text>
 
-        {/* CONNECTION TO DB */}
         <path className="live-draw" style={{animationDelay: '5.5s'}} pathLength="100" d="M 290 185 L 330 125" stroke="currentColor" strokeWidth="3" fill="none"/>
-
-        {/* NODE 5: REDIS / DB */}
         <ellipse className="live-draw" style={{animationDelay: '6s'}} pathLength="100" cx="350" cy="95" rx="25" ry="10" stroke="#eab308" strokeWidth="3" fill="#1e293b"/>
         <path className="live-draw" style={{animationDelay: '6.5s'}} pathLength="100" d="M 325 95 L 325 145 A 25 10 0 0 0 375 145 L 375 95" stroke="#eab308" strokeWidth="3" fill="none"/>
         <text x="350" y="130" className="text-[10px] fill-yellow-400 opacity-0" style={{animation: 'fadeInText 0.5s forwards 7s'}} textAnchor="middle">REDIS</text>
-
       </svg>
     </div>
   </div>
 );
 
 const CodingStep = () => {
-  // BUG FIX: Changed JSX.Element[] to React.ReactNode[]
   const [codeLines, setCodeLines] = useState<React.ReactNode[]>([]);
   
   const rawCode = [
@@ -100,22 +121,16 @@ const CodingStep = () => {
   ];
 
   useEffect(() => {
-    // BUG FIX: Changed JSX.Element[] to React.ReactNode[]
     let currentLines: React.ReactNode[] = [];
     let chunkIndex = 0;
-    
     const typeChunk = () => {
       if (chunkIndex >= rawCode.length) return;
       const chunk = rawCode[chunkIndex];
-      
       currentLines.push(<span key={chunkIndex} className={chunk.color}>{chunk.text}</span>);
       setCodeLines([...currentLines]);
-      
       chunkIndex++;
-      const nextDelay = Math.random() * 120 + 30; 
-      setTimeout(typeChunk, nextDelay);
+      setTimeout(typeChunk, Math.random() * 120 + 30); 
     };
-    
     setTimeout(typeChunk, 500);
   }, []);
 
@@ -140,7 +155,6 @@ const CodingStep = () => {
 };
 
 const DebugStep = () => {
-  // BUG FIX: Changed JSX.Element[] to React.ReactNode[]
   const [logs, setLogs] = useState<React.ReactNode[]>([]);
   const [isGlitching, setIsGlitching] = useState(false);
 
@@ -171,10 +185,7 @@ const DebugStep = () => {
   return (
     <div className={`w-full h-full bg-gray-950 p-4 font-mono text-[10px] md:text-xs text-gray-300 text-left flex flex-col overflow-hidden relative ${isGlitching ? 'animate-[glitchShake_0.2s_infinite]' : ''}`}>
       <div className={`absolute inset-0 bg-red-500/20 pointer-events-none transition-opacity duration-75 ${isGlitching ? 'opacity-100' : 'opacity-0'}`}></div>
-      
-      {logs.map((log, i) => (
-        <div key={i} className="mb-1">{log}</div>
-      ))}
+      {logs.map((log, i) => <div key={i} className="mb-1">{log}</div>)}
       <div className="mt-2 flex items-center">
         <span className="text-emerald-400 mr-2">~/app ➜</span> <span className="animate-pulse w-2 h-4 bg-gray-400 inline-block"></span>
       </div>
@@ -187,7 +198,6 @@ const DeployStep = () => (
     <div className="absolute top-6 text-white font-sans text-xl md:text-2xl font-black z-20 animate-[pulse_2s_infinite] tracking-[0.3em]">
       DEPLOYING...
     </div>
-    
     <svg className="w-full h-full text-white z-10" viewBox="0 0 200 200">
       <g style={{ animation: 'rocketLaunch 7s ease-in forwards' }}>
         <path className="live-draw" style={{animationDuration: '2s'}} pathLength="100" d="M 100 40 C 120 70 120 120 120 140 L 80 140 C 80 120 80 70 100 40 Z" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
@@ -209,7 +219,13 @@ export default function NotebookPortfolio() {
   const [buildStep, setBuildStep] = useState(1);
   const [loopKey, setLoopKey] = useState(0); 
 
+  // Use our custom hook to check if the computer is on screen (Wait until 30% visible)
+  const [monitorRef, isMonitorVisible] = useScrollReveal(0.3);
+
+  // The 35-sec loop ONLY runs if isMonitorVisible is true!
   useEffect(() => {
+    if (!isMonitorVisible) return;
+
     let timer: NodeJS.Timeout;
     if (buildStep === 1) timer = setTimeout(() => setBuildStep(2), 10000); 
     else if (buildStep === 2) timer = setTimeout(() => setBuildStep(3), 7000);  
@@ -219,8 +235,9 @@ export default function NotebookPortfolio() {
       setLoopKey(prev => prev + 1); 
     }, 7000); 
     return () => clearTimeout(timer);
-  }, [buildStep]);
+  }, [buildStep, isMonitorVisible]);
 
+  // --- TIC-TAC-TOE AI STATE ---
   const [board, setBoard] = useState(Array(9).fill(null));
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
   const [winningLine, setWinningLine] = useState<string | null>(null);
@@ -231,16 +248,6 @@ export default function NotebookPortfolio() {
     [0, 4, 8, "M 5 5 L 95 95"],  [2, 4, 6, "M 95 5 L 5 95"]
   ];
 
-  const checkWinner = (squares: any[]) => {
-    for (let i = 0; i < winningCombinations.length; i++) {
-      const [a, b, c, path] = winningCombinations[i];
-      if (squares[a as number] && squares[a as number] === squares[b as number] && squares[a as number] === squares[c as number]) {
-        return { winner: squares[a as number], path: path as string };
-      }
-    }
-    return null;
-  };
-
   const handlePlayerMove = (i: number) => {
     if (board[i] || winningLine || !isPlayerTurn) return;
     const newBoard = [...board];
@@ -250,6 +257,16 @@ export default function NotebookPortfolio() {
   };
 
   useEffect(() => {
+    const checkWinner = (squares: any[]) => {
+      for (let i = 0; i < winningCombinations.length; i++) {
+        const [a, b, c, path] = winningCombinations[i];
+        if (squares[a as number] && squares[a as number] === squares[b as number] && squares[a as number] === squares[c as number]) {
+          return { winner: squares[a as number], path: path as string };
+        }
+      }
+      return null;
+    };
+
     const status = checkWinner(board);
     if (status) {
       setWinningLine(status.path);
@@ -284,8 +301,16 @@ export default function NotebookPortfolio() {
         backgroundPosition: 'center top'
       }}
     >
+      {/* GLOBAL CSS: Notice the .is-visible prefix. Elements only draw when scrolled to! */}
       <style dangerouslySetInnerHTML={{__html: `
-        .live-draw { stroke-dasharray: 100; stroke-dashoffset: 100; animation: drawPath 1s ease-out forwards; }
+        .live-draw { stroke-dasharray: 100; stroke-dashoffset: 100; }
+        .is-visible .live-draw { 
+           animation-name: drawPath; 
+           animation-duration: 1.2s; 
+           animation-timing-function: ease-out; 
+           animation-fill-mode: forwards; 
+        }
+
         @keyframes drawPath { to { stroke-dashoffset: 0; } }
         html { scroll-behavior: smooth; }
         
@@ -328,8 +353,8 @@ export default function NotebookPortfolio() {
         <path d="M 20 20 L 25 35 L 40 40 L 25 45 L 20 60 L 15 45 L 0 40 L 15 35 Z" fill="currentColor" transform="scale(0.5) translate(120, -50)"/>
       </svg>
 
-      {/* 1. HEADER */}
-      <header className="pt-8 px-6 md:px-12 w-full max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 pb-6 mb-8 relative z-10">
+      {/* 1. HEADER (Wrapped in RevealSection) */}
+      <RevealSection as="header" className="pt-8 px-6 md:px-12 w-full max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 pb-6 mb-8 relative z-10">
         <div className="relative inline-block transform -rotate-2">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight">
             Hi, I'm sky!
@@ -364,12 +389,17 @@ export default function NotebookPortfolio() {
             <OrangeUnderline className="-bottom-1" delay="1.3s" />
           </a>
         </nav>
-      </header>
+      </RevealSection>
 
       <main className="w-full max-w-6xl mx-auto px-6 md:px-12 flex flex-col gap-24 relative z-10">
         
         {/* 2. HERO SECTION */}
-        <section className="flex flex-col-reverse md:flex-row justify-between items-start gap-12 relative">
+        <RevealSection className="flex flex-col-reverse md:flex-row justify-between items-start gap-12 relative">
+          
+          <svg className="absolute -top-12 right-4 w-24 h-24 text-gray-300 pointer-events-none transform rotate-12" viewBox="0 0 100 100">
+            <path className="live-draw" d="M 20 50 C 20 20 80 20 80 50 C 80 80 40 80 40 60 C 40 40 60 40 60 55 C 60 70 50 70 50 65" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/>
+          </svg>
+
           <div className="w-full md:w-[55%]">
             <div className="flex items-end gap-2 mb-6">
               <svg className="w-12 h-12 text-gray-900 pb-1 transform -rotate-6" viewBox="0 0 100 100">
@@ -396,17 +426,10 @@ export default function NotebookPortfolio() {
                   </span>
                 ))}
               </div>
-              <svg className="absolute -right-8 bottom-0 w-12 h-12 text-red-500 pointer-events-none transform rotate-45 hidden md:block" viewBox="0 0 100 100">
-                <path d="M 20 80 Q 50 20 90 20 M 70 10 L 90 20 L 80 40" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
             </div>
           </div>
 
           <div className="w-full md:w-[45%] flex flex-col justify-center items-center relative">
-            <svg className="absolute -top-12 left-10 w-16 h-16 text-blue-500 pointer-events-none transform -rotate-12 hidden md:block" viewBox="0 0 100 100">
-              <path d="M 10 90 Q 30 10 90 50 M 70 35 L 90 50 L 75 70" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-
             <div className="relative w-56 h-56 md:w-72 md:h-72 transform -rotate-4 transition-transform hover:-rotate-2">
               <svg className="absolute inset-0 w-full h-full text-black pointer-events-none z-0" viewBox="0 0 100 100">
                 <path className="live-draw" style={{animationDelay: '1s'}} pathLength="100" d="M 33 5 L 35 95 M 66 2 L 64 98 M 2 33 L 98 35 M 5 66 L 95 64" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round"/>
@@ -441,25 +464,37 @@ export default function NotebookPortfolio() {
               )}
             </div>
           </div>
-        </section>
+        </RevealSection>
 
         {/* 3. PROJECTS SECTION */}
-        <section id="projects" className="pt-10 scroll-mt-24 relative">
+        <RevealSection id="projects" className="pt-10 scroll-mt-24 relative">
+          <svg className="absolute -top-12 -left-8 w-16 h-16 text-gray-300 pointer-events-none transform -rotate-12" viewBox="0 0 100 100">
+            <path className="live-draw" d="M 10 30 Q 30 10 50 30 T 90 30 M 15 50 Q 40 30 60 50 T 85 50 M 20 70 Q 50 50 70 70" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/>
+          </svg>
+
           <div className="relative inline-block mb-10">
             <h2 className="text-4xl font-bold transform -rotate-1">Proof of Work</h2>
             <OrangeUnderline className="-bottom-1" delay="0s" />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
-            <div className="relative bg-white p-4 pb-12 border border-gray-200 shadow-[8px_8px_0_0_rgba(0,0,0,0.8)] transform rotate-1 transition-transform hover:-rotate-1">
+            
+            {/* Project 1: Cnoize (LINK TO LIVE EMULATOR) */}
+            <Link href="/projects/cnoize" className="block relative bg-white p-4 pb-12 border border-gray-200 shadow-[8px_8px_0_0_rgba(0,0,0,0.8)] transform rotate-1 transition-transform hover:-rotate-1 cursor-pointer group">
+              {/* Try Live App Badge */}
+              <div className="absolute -right-4 -top-4 bg-red-500 text-white font-bold px-3 py-1 text-sm transform rotate-12 opacity-0 group-hover:opacity-100 transition-opacity z-40 rounded-sm">
+                Try Live App!
+              </div>
+              
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-yellow-200/80 transform -rotate-2 border border-yellow-300"></div>
               <div className="aspect-video bg-gray-900 rounded-sm mb-4 flex items-center justify-center text-white border-2 border-black overflow-hidden">
                 <img src="/cnoize.png" alt="Cnoize Trading App Interface" className="w-full h-full object-cover" />
               </div>
-              <h3 className="text-3xl font-bold mb-2">Cnoize Trading App</h3>
+              <h3 className="text-3xl font-bold mb-2 group-hover:text-blue-600 transition-colors">Cnoize Trading App</h3>
               <p className="text-xl text-gray-700 leading-tight">Kotlin/Jetpack Compose UI powered by real-time WebSockets and Upstash Redis.</p>
-            </div>
+            </Link>
 
+            {/* Project 2: Agentic Workflow */}
             <div className="relative bg-white p-4 pb-12 border border-gray-200 shadow-[8px_8px_0_0_rgba(0,0,0,0.8)] transform -rotate-2 transition-transform hover:rotate-1">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-yellow-200/80 transform rotate-3 border border-yellow-300"></div>
               <div className="aspect-video bg-blue-900 rounded-sm mb-4 flex items-center justify-center text-white border-2 border-black">
@@ -469,6 +504,7 @@ export default function NotebookPortfolio() {
               <p className="text-xl text-gray-700 leading-tight">Zero-hallucination data extraction tool using custom Python LLM orchestration.</p>
             </div>
 
+            {/* Project 3: Native Storefront */}
             <div className="relative bg-white p-4 pb-12 border border-gray-200 shadow-[8px_8px_0_0_rgba(0,0,0,0.8)] transform rotate-2 transition-transform hover:-rotate-1">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-red-200/80 transform -rotate-1 border border-red-300"></div>
               <div className="aspect-video bg-emerald-900 rounded-sm mb-4 flex items-center justify-center text-white border-2 border-black">
@@ -478,26 +514,20 @@ export default function NotebookPortfolio() {
               <p className="text-xl text-gray-700 leading-tight">Cross-platform e-commerce app built in a React Native environment. Optimized for scalability.</p>
             </div>
           </div>
-        </section>
+        </RevealSection>
 
         {/* 4. THE RETRO COMPUTER PIPELINE SECTION */}
-        <section className="pt-16 pb-10 relative">
+        <RevealSection className="pt-16 pb-10 relative">
           <div className="relative inline-block mb-10">
             <h2 className="text-4xl font-bold transform -rotate-1">How it gets built</h2>
             <CyanSquiggle className="-bottom-2" delay="0s" />
           </div>
 
-          <div className="w-full max-w-4xl mx-auto flex flex-col items-center">
-            {/* Monitor Body */}
+          <div ref={monitorRef as any} className="w-full max-w-4xl mx-auto flex flex-col items-center">
             <div className="w-full bg-[#e2e8f0] border-4 border-black rounded-[2rem] p-4 md:p-8 shadow-[12px_12px_0_0_rgba(0,0,0,1)] relative z-10">
-              
-              {/* Screen Bezel */}
               <div className="w-full aspect-[1.1/1] md:aspect-[1.8/1] bg-[#cbd5e1] border-4 border-black rounded-2xl p-3 md:p-5 shadow-inner relative">
-                
-                {/* Glass Screen */}
                 <div className="w-full h-full bg-gray-950 border-4 border-black rounded-xl overflow-hidden relative shadow-[inset_0_0_30px_rgba(0,0,0,1)] flex items-center justify-center">
                   
-                  {/* Key forces remount/re-animation of components */}
                   <React.Fragment key={loopKey}>
                     {buildStep === 1 && <DrawboardStep />}
                     {buildStep === 2 && <CodingStep />}
@@ -505,13 +535,11 @@ export default function NotebookPortfolio() {
                     {buildStep === 4 && <DeployStep />}
                   </React.Fragment>
 
-                  {/* Retro CRT Scanline Overlay */}
                   <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:100%_4px]"></div>
                   <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-white/5 to-transparent h-[10%] opacity-50 animate-[crtScanline_6s_linear_infinite]"></div>
                 </div>
               </div>
               
-              {/* Monitor Dashboard */}
               <div className="flex flex-col md:flex-row justify-between items-center mt-6 px-2 gap-4">
                 <div className="flex gap-2 md:gap-4 items-center">
                    <div className={`px-2 md:px-3 py-1 rounded font-mono text-[10px] md:text-xs font-bold transition-colors ${buildStep === 1 ? 'bg-blue-600 text-white' : 'text-gray-500'}`}>1.ARCH</div>
@@ -526,14 +554,18 @@ export default function NotebookPortfolio() {
               </div>
             </div>
 
-            {/* Stand Base */}
             <div className="w-24 md:w-32 h-8 md:h-12 bg-[#cbd5e1] border-x-4 border-black relative z-0 -mt-2"></div>
             <div className="w-48 md:w-64 h-6 bg-[#94a3b8] border-4 border-black rounded-t-xl shadow-[8px_8px_0_0_rgba(0,0,0,1)] relative z-0"></div>
           </div>
-        </section>
+        </RevealSection>
 
         {/* 5. TESTIMONIALS SECTION */}
-        <section id="testimonials" className="pt-10 scroll-mt-24">
+        <RevealSection id="testimonials" className="pt-10 scroll-mt-24 relative">
+          <svg className="absolute -top-10 right-10 w-16 h-16 text-yellow-400/80 pointer-events-none" viewBox="0 0 100 100">
+            <path className="live-draw" d="M 50 10 L 55 45 L 90 50 L 55 55 L 50 90 L 45 55 L 10 50 L 45 45 Z" fill="currentColor"/>
+            <path className="live-draw" style={{animationDelay: '0.3s'}} d="M 20 20 L 25 35 L 40 40 L 25 45 L 20 60 L 15 45 L 0 40 L 15 35 Z" fill="currentColor" transform="scale(0.5) translate(120, -50)"/>
+          </svg>
+
           <div className="relative inline-block mb-10">
             <h2 className="text-4xl font-bold transform -rotate-1">Word on the street</h2>
             <OrangeUnderline className="-bottom-1" delay="0s" />
@@ -549,12 +581,12 @@ export default function NotebookPortfolio() {
               <p className="text-xl font-bold text-gray-600">- Technical Lead</p>
             </div>
           </div>
-        </section>
+        </RevealSection>
 
         {/* 6. CONTACT SECTION */}
-        <section id="contact" className="pt-10 pb-20 scroll-mt-24 flex flex-col items-center text-center relative">
+        <RevealSection id="contact" className="pt-10 pb-20 scroll-mt-24 flex flex-col items-center text-center relative">
           <svg className="absolute -top-4 right-10 md:right-40 w-16 h-16 text-gray-400 pointer-events-none transform rotate-12 hidden md:block" viewBox="0 0 100 100">
-            <path d="M 20 30 L 70 30 L 65 70 C 65 80 25 80 25 70 Z M 70 40 C 85 40 85 60 70 60 M 35 15 C 35 5 45 25 45 15 M 55 15 C 55 5 65 25 65 15" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+            <path className="live-draw" d="M 20 30 L 70 30 L 65 70 C 65 80 25 80 25 70 Z M 70 40 C 85 40 85 60 70 60 M 35 15 C 35 5 45 25 45 15 M 55 15 C 55 5 65 25 65 15" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
 
           <h2 className="text-5xl font-bold mb-6 transform -rotate-2">Let's build something.</h2>
@@ -570,7 +602,7 @@ export default function NotebookPortfolio() {
               Say Hello
             </div>
           </a>
-        </section>
+        </RevealSection>
 
       </main>
     </div>
