@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Caveat } from 'next/font/google';
 
 const penFont = Caveat({ 
@@ -27,74 +27,56 @@ const CyanSquiggle = ({ className = "", delay = "0s" }) => (
 // ==========================================
 
 const DrawboardStep = () => (
-  <div className="w-full h-full bg-[#f8fafc] relative flex flex-col items-center justify-center overflow-hidden">
-    <h3 className="absolute top-4 left-6 text-2xl md:text-3xl font-bold text-gray-800 transform -rotate-2 z-20">1. Architecture Scope</h3>
+  <div className="w-full h-full bg-[#0f172a] relative flex flex-col items-center justify-center overflow-hidden font-mono shadow-[inset_0_0_40px_rgba(0,0,0,0.8)]">
     
-    <div className="relative w-full h-full flex items-center justify-center px-4 mt-8">
-      
-      {/* THE LIVE DRAWING STICKMAN */}
-      <div className="relative w-24 h-40 md:w-32 md:h-48 transform -translate-y-4">
-        <svg className="w-full h-full text-black" viewBox="0 0 100 150">
-           {/* Head */}
-           <circle className="live-draw" pathLength="100" cx="40" cy="30" r="18" stroke="currentColor" strokeWidth="4" fill="none"/>
-           {/* Body */}
-           <path className="live-draw" style={{animationDelay: '0.2s'}} pathLength="100" d="M 40 48 L 40 100" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round"/>
-           {/* Left Leg */}
-           <path className="live-draw" style={{animationDelay: '0.4s'}} pathLength="100" d="M 40 100 L 20 140" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round"/>
-           {/* Right Leg */}
-           <path className="live-draw" style={{animationDelay: '0.5s'}} pathLength="100" d="M 40 100 L 60 140" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round"/>
-           {/* Left Arm */}
-           <path className="live-draw" style={{animationDelay: '0.6s'}} pathLength="100" d="M 40 60 L 20 80" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round"/>
-           
-           {/* RIGHT ARM (ANIMATED DRAWING MOTION) */}
-           <g className="origin-[40px_60px] animate-[sketchMotion_0.3s_linear_infinite_alternate]" style={{ animationDelay: '1s' }}>
-             <path d="M 40 60 L 80 40 L 95 35" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-             {/* Pen */}
-             <path d="M 90 35 L 105 25" stroke="blue" strokeWidth="3" fill="none" strokeLinecap="round"/>
-           </g>
-        </svg>
+    {/* Blueprint Grid Background */}
+    <div className="absolute inset-0 opacity-20 bg-[linear-gradient(to_right,#334155_1px,transparent_1px),linear-gradient(to_bottom,#334155_1px,transparent_1px)] bg-[size:20px_20px]"></div>
+    
+    <h3 className="absolute top-4 left-4 text-emerald-400 text-xs md:text-sm font-bold tracking-widest z-20 animate-pulse">
+      SYSTEM_ARCHITECTURE_MAP
+    </h3>
+    
+    <div className="relative w-full h-full flex items-center justify-center p-2 z-10">
+      <svg className="w-full h-full md:w-[90%] md:h-[90%] text-slate-300" viewBox="0 0 400 250">
+        
+        {/* Animated Data Streams (Dashed lines moving) */}
+        <path className="animate-[dashMove_1s_linear_infinite]" style={{animationDelay: '3s', opacity: 0, animationFillMode: 'forwards'}} d="M 70 125 L 130 125" stroke="#3b82f6" strokeWidth="2" strokeDasharray="4 4" fill="none"/>
+        <path className="animate-[dashMove_1s_linear_infinite]" style={{animationDelay: '4.5s', opacity: 0, animationFillMode: 'forwards'}} d="M 170 105 L 230 65" stroke="#10b981" strokeWidth="2" strokeDasharray="4 4" fill="none"/>
+        <path className="animate-[dashMove_1s_linear_infinite]" style={{animationDelay: '5s', opacity: 0, animationFillMode: 'forwards'}} d="M 170 145 L 230 185" stroke="#ef4444" strokeWidth="2" strokeDasharray="4 4" fill="none"/>
+        <path className="animate-[dashMove_1s_linear_infinite]" style={{animationDelay: '6.5s', opacity: 0, animationFillMode: 'forwards'}} d="M 270 185 L 330 125" stroke="#eab308" strokeWidth="2" strokeDasharray="4 4" fill="none"/>
 
-        {/* Brainstorming Bubbles */}
-        <svg className="absolute -top-4 -left-4 w-16 h-20 text-orange-500" viewBox="0 0 50 80">
-          <circle className="live-draw" style={{animationDelay: '1.5s'}} pathLength="100" cx="40" cy="70" r="3" stroke="currentColor" strokeWidth="2" fill="none"/>
-          <circle className="live-draw" style={{animationDelay: '1.7s'}} pathLength="100" cx="30" cy="55" r="6" stroke="currentColor" strokeWidth="2" fill="none"/>
-          <circle className="live-draw" style={{animationDelay: '1.9s'}} pathLength="100" cx="20" cy="25" r="15" stroke="currentColor" strokeWidth="2" fill="none"/>
-        </svg>
-      </div>
+        {/* --- NODE 1: CLIENT --- */}
+        <rect className="live-draw" style={{animationDelay: '0.5s'}} pathLength="100" x="20" y="100" width="50" height="50" rx="8" stroke="currentColor" strokeWidth="3" fill="#1e293b"/>
+        <text x="45" y="130" className="text-[10px] fill-white opacity-0" style={{animation: 'fadeInText 0.5s forwards 1s'}} textAnchor="middle">APP</text>
 
-      {/* THE WHITEBOARD (Complex System Arch Drawing) */}
-      <div className="w-56 h-40 md:w-72 md:h-52 bg-white border-4 border-gray-900 shadow-[8px_8px_0_0_rgba(0,0,0,0.15)] transform rotate-1 relative ml-2 p-2 flex items-center justify-center">
-        <svg className="w-full h-full text-black" viewBox="0 0 200 150">
-          {/* Client App (Phone) */}
-          <rect className="live-draw" style={{animationDelay: '1.2s'}} pathLength="100" x="10" y="50" width="30" height="50" rx="4" stroke="currentColor" strokeWidth="3" fill="none"/>
-          <circle className="live-draw" style={{animationDelay: '1.5s'}} pathLength="100" cx="25" cy="90" r="2" stroke="currentColor" strokeWidth="2" fill="none"/>
-          
-          {/* Arrow 1 */}
-          <path className="live-draw" style={{animationDelay: '2s'}} pathLength="100" d="M 45 75 L 75 75" stroke="#3b82f6" strokeWidth="3" strokeDasharray="4 4" fill="none"/>
-          <path className="live-draw" style={{animationDelay: '2.2s'}} pathLength="100" d="M 65 70 L 75 75 L 65 80" stroke="#3b82f6" strokeWidth="3" fill="none" strokeLinecap="round"/>
+        {/* --- CONNECTION 1 --- */}
+        <path className="live-draw" style={{animationDelay: '1.5s'}} pathLength="100" d="M 70 125 L 130 125" stroke="currentColor" strokeWidth="3" fill="none"/>
 
-          {/* Load Balancer / API Gateway (Cloud) */}
-          <path className="live-draw" style={{animationDelay: '2.5s'}} pathLength="100" d="M 90 85 C 80 85 80 65 95 65 C 95 50 115 50 120 60 C 135 60 135 85 120 85 Z" stroke="currentColor" strokeWidth="3" fill="none" strokeLinejoin="round"/>
-          
-          {/* Arrow 2 (Up to DB) */}
-          <path className="live-draw" style={{animationDelay: '3.5s'}} pathLength="100" d="M 110 60 L 110 40 L 135 40" stroke="#ef4444" strokeWidth="3" fill="none"/>
-          <path className="live-draw" style={{animationDelay: '3.7s'}} pathLength="100" d="M 125 35 L 135 40 L 125 45" stroke="#ef4444" strokeWidth="3" fill="none" strokeLinecap="round"/>
+        {/* --- NODE 2: API GATEWAY --- */}
+        <path className="live-draw" style={{animationDelay: '2s'}} pathLength="100" d="M 150 95 L 170 125 L 150 155 L 130 125 Z" stroke="#3b82f6" strokeWidth="3" fill="#1e293b"/>
+        <text x="150" y="170" className="text-[8px] fill-blue-400 opacity-0" style={{animation: 'fadeInText 0.5s forwards 2.5s'}} textAnchor="middle">API_GATEWAY</text>
 
-          {/* Database (Cylinder) */}
-          <ellipse className="live-draw" style={{animationDelay: '4s'}} pathLength="100" cx="160" cy="25" rx="20" ry="8" stroke="currentColor" strokeWidth="3" fill="none"/>
-          <path className="live-draw" style={{animationDelay: '4.5s'}} pathLength="100" d="M 140 25 L 140 50 A 20 8 0 0 0 180 50 L 180 25" stroke="currentColor" strokeWidth="3" fill="none"/>
-          <ellipse className="live-draw" style={{animationDelay: '5s'}} pathLength="100" cx="160" cy="35" rx="20" ry="8" stroke="currentColor" strokeWidth="2" strokeDasharray="2 4" fill="none"/>
+        {/* --- CONNECTIONS OUT OF GATEWAY --- */}
+        <path className="live-draw" style={{animationDelay: '3s'}} pathLength="100" d="M 170 105 L 230 65" stroke="currentColor" strokeWidth="3" fill="none"/>
+        <path className="live-draw" style={{animationDelay: '3.5s'}} pathLength="100" d="M 170 145 L 230 185" stroke="currentColor" strokeWidth="3" fill="none"/>
 
-          {/* Arrow 3 (Down to Server) */}
-          <path className="live-draw" style={{animationDelay: '6s'}} pathLength="100" d="M 110 85 L 110 110 L 135 110" stroke="#10b981" strokeWidth="3" fill="none"/>
-          <path className="live-draw" style={{animationDelay: '6.2s'}} pathLength="100" d="M 125 105 L 135 110 L 125 115" stroke="#10b981" strokeWidth="3" fill="none" strokeLinecap="round"/>
+        {/* --- NODE 3: AUTH SERVICE (TOP) --- */}
+        <rect className="live-draw" style={{animationDelay: '4s'}} pathLength="100" x="230" y="40" width="60" height="40" rx="4" stroke="#10b981" strokeWidth="3" fill="#1e293b"/>
+        <text x="260" y="63" className="text-[10px] fill-emerald-400 opacity-0" style={{animation: 'fadeInText 0.5s forwards 4.5s'}} textAnchor="middle">AUTH</text>
 
-          {/* Server Node (Box) */}
-          <rect className="live-draw" style={{animationDelay: '6.5s'}} pathLength="100" x="140" y="95" width="40" height="30" stroke="currentColor" strokeWidth="3" fill="none"/>
-          <line className="live-draw" style={{animationDelay: '7s'}} pathLength="100" x1="145" y1="105" x2="175" y2="105" stroke="currentColor" strokeWidth="2" fill="none"/>
-          <line className="live-draw" style={{animationDelay: '7.2s'}} pathLength="100" x1="145" y1="115" x2="160" y2="115" stroke="currentColor" strokeWidth="2" fill="none"/>
-        </svg>
-      </div>
+        {/* --- NODE 4: WEBSOCKETS (BOTTOM) --- */}
+        <rect className="live-draw" style={{animationDelay: '4.5s'}} pathLength="100" x="230" y="165" width="60" height="40" rx="4" stroke="#ef4444" strokeWidth="3" fill="#1e293b"/>
+        <text x="260" y="188" className="text-[10px] fill-red-400 opacity-0" style={{animation: 'fadeInText 0.5s forwards 5s'}} textAnchor="middle">WSS_NODE</text>
+
+        {/* --- CONNECTION TO DB --- */}
+        <path className="live-draw" style={{animationDelay: '5.5s'}} pathLength="100" d="M 290 185 L 330 125" stroke="currentColor" strokeWidth="3" fill="none"/>
+
+        {/* --- NODE 5: REDIS / DB (RIGHT) --- */}
+        <ellipse className="live-draw" style={{animationDelay: '6s'}} pathLength="100" cx="350" cy="95" rx="25" ry="10" stroke="#eab308" strokeWidth="3" fill="#1e293b"/>
+        <path className="live-draw" style={{animationDelay: '6.5s'}} pathLength="100" d="M 325 95 L 325 145 A 25 10 0 0 0 375 145 L 375 95" stroke="#eab308" strokeWidth="3" fill="none"/>
+        <text x="350" y="130" className="text-[10px] fill-yellow-400 opacity-0" style={{animation: 'fadeInText 0.5s forwards 7s'}} textAnchor="middle">REDIS</text>
+
+      </svg>
     </div>
   </div>
 );
@@ -130,7 +112,7 @@ const CodingStep = () => {
       setCodeLines([...currentLines]);
       
       chunkIndex++;
-      const nextDelay = Math.random() * 150 + 50; // Random delay 50-200ms
+      const nextDelay = Math.random() * 120 + 30; // Random delay 30-150ms
       setTimeout(typeChunk, nextDelay);
     };
     
@@ -139,14 +121,11 @@ const CodingStep = () => {
 
   return (
     <div className="w-full h-full bg-[#1e1e1e] font-mono text-xs md:text-sm text-left flex flex-col shadow-inner">
-      {/* IDE Top Bar */}
       <div className="w-full bg-[#2d2d2d] flex items-center border-b border-black">
         <div className="px-4 py-1 bg-[#1e1e1e] text-gray-300 border-t-2 border-blue-500 text-[10px] flex items-center gap-2">
-          <span className="text-blue-400 font-bold">TS</span> main.ts
+          <span className="text-blue-400 font-bold">TS</span> server.ts
         </div>
       </div>
-      
-      {/* IDE Body */}
       <div className="flex-1 p-3 overflow-hidden relative">
         <div className="absolute left-0 top-0 bottom-0 w-8 bg-[#1e1e1e] border-r border-[#333] flex flex-col items-end py-3 pr-2 text-[#666] select-none">
           {Array.from({length: 12}).map((_, i) => <div key={i}>{i+1}</div>)}
@@ -166,15 +145,17 @@ const DebugStep = () => {
 
   useEffect(() => {
     const timeline = [
-      { t: 500, elem: <span><span className="text-blue-400">➜</span>  ~ Build started... compiling node modules.</span> },
-      { t: 1800, elem: <span><span className="text-emerald-400">✔</span>  Done in 1.2s.</span> },
-      { t: 2500, elem: <span><span className="text-blue-400">➜</span>  ~ Running unit tests suite (142 tests)...</span> },
-      { t: 4000, elem: <span className="text-red-500 font-bold bg-red-950/50 p-1 w-full block">✖  FATAL: Expected undefined to be a function.</span> },
-      { t: 4200, action: () => setIsGlitching(true) }, // Trigger screen shake
+      { t: 300, elem: <span><span className="text-emerald-400">~/app</span> ➜ git add . && git commit -m "feat: init websocket bridge"</span> },
+      { t: 1500, elem: <span><span className="text-emerald-400">~/app</span> ➜ git push origin main</span> },
+      { t: 2500, elem: <span className="text-gray-500">... GitHub Actions CI/CD Triggered ...</span> },
+      { t: 3500, elem: <span className="text-gray-500">... Running integration tests (142/142) ...</span> },
+      { t: 4500, elem: <span className="text-red-500 font-bold bg-red-950/50 p-1 w-full block">✖ FATAL: Race condition detected in WS stream. Process exited with code 1.</span> },
+      { t: 4700, action: () => setIsGlitching(true) }, // Trigger screen shake
       { t: 5500, action: () => setIsGlitching(false) },
-      { t: 6000, elem: <span><span className="text-blue-400">➜</span>  ~ Debugger attached. Rewriting async boundary...</span> },
-      { t: 7500, elem: <span><span className="text-blue-400">➜</span>  ~ Hot Module Replacement (HMR) triggered.</span> },
-      { t: 9000, elem: <span className="text-emerald-400 font-bold block mt-2 text-sm md:text-base border-t border-dashed border-emerald-800 pt-2">✨ SUCCESS: 142/142 passed. Server listening on :3000</span> },
+      { t: 6000, elem: <span><span className="text-emerald-400">~/app</span> ➜ git checkout -b hotfix/ws-race</span> },
+      { t: 7500, elem: <span><span className="text-emerald-400">~/app</span> ➜ git commit -am "hotfix: implement mutex lock"</span> },
+      { t: 8500, elem: <span><span className="text-emerald-400">~/app</span> ➜ git push --force origin hotfix/ws-race</span> },
+      { t: 10000, elem: <span className="text-blue-400 font-bold block mt-2 text-sm md:text-base border-t border-dashed border-blue-800 pt-2">✨ SUCCESS: CI passed. Merged to main. Ready for deployment.</span> },
     ];
 
     const timeouts = timeline.map(({ t, elem, action }) => 
@@ -187,15 +168,14 @@ const DebugStep = () => {
   }, []);
 
   return (
-    <div className={`w-full h-full bg-gray-950 p-4 font-mono text-xs md:text-sm text-gray-300 text-left flex flex-col overflow-hidden relative ${isGlitching ? 'animate-[glitchShake_0.2s_infinite]' : ''}`}>
-      {/* Red flash overlay during error */}
+    <div className={`w-full h-full bg-gray-950 p-4 font-mono text-[10px] md:text-xs text-gray-300 text-left flex flex-col overflow-hidden relative ${isGlitching ? 'animate-[glitchShake_0.2s_infinite]' : ''}`}>
       <div className={`absolute inset-0 bg-red-500/20 pointer-events-none transition-opacity duration-75 ${isGlitching ? 'opacity-100' : 'opacity-0'}`}></div>
       
       {logs.map((log, i) => (
         <div key={i} className="mb-1">{log}</div>
       ))}
       <div className="mt-2 flex items-center">
-        <span className="text-green-500 mr-2">➜</span> <span className="animate-pulse w-2 h-4 bg-gray-400 inline-block"></span>
+        <span className="text-emerald-400 mr-2">~/app ➜</span> <span className="animate-pulse w-2 h-4 bg-gray-400 inline-block"></span>
       </div>
     </div>
   )
@@ -209,18 +189,18 @@ const DeployStep = () => (
     
     <svg className="w-full h-full text-white z-10" viewBox="0 0 200 200">
       <g style={{ animation: 'rocketLaunch 7s ease-in forwards' }}>
-        {/* Rocket Body (Draws first 2 seconds) */}
+        {/* Rocket Body */}
         <path className="live-draw" style={{animationDuration: '2s'}} pathLength="100" d="M 100 40 C 120 70 120 120 120 140 L 80 140 C 80 120 80 70 100 40 Z" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
         {/* Fins */}
         <path className="live-draw" style={{animationDelay: '1s', animationDuration: '1s'}} pathLength="100" d="M 80 120 L 50 150 L 80 140 M 120 120 L 150 150 L 120 140" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
         {/* Window */}
         <circle className="live-draw" style={{animationDelay: '1.5s', animationDuration: '0.5s'}} pathLength="100" cx="100" cy="90" r="12" stroke="currentColor" strokeWidth="4" fill="none"/>
         
-        {/* Fire Flames (Draws at 2.5s, then pulses) */}
+        {/* Fire Flames */}
         <path className="live-draw text-orange-500 origin-top animate-[flameFlicker_0.1s_infinite]" style={{animationDelay: '2.5s', animationDuration: '0.5s'}} pathLength="100" d="M 85 140 L 85 170 L 100 190 L 115 170 L 115 140" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
       </g>
       
-      {/* Smoke Clouds (Left behind as it launches) */}
+      {/* Smoke Clouds */}
       <path className="opacity-0 text-gray-500 animate-[fadeInOut_4s_ease-in-out_3.5s_forwards]" d="M 70 180 Q 50 160 30 190 Q 60 210 90 190" stroke="currentColor" strokeWidth="6" strokeLinecap="round" fill="none"/>
       <path className="opacity-0 text-gray-500 animate-[fadeInOut_4s_ease-in-out_3.8s_forwards]" d="M 130 180 Q 150 160 170 190 Q 140 210 110 190" stroke="currentColor" strokeWidth="6" strokeLinecap="round" fill="none"/>
     </svg>
@@ -234,18 +214,17 @@ const DeployStep = () => (
 export default function NotebookPortfolio() {
   // --- BUILD PIPELINE STATE ---
   const [buildStep, setBuildStep] = useState(1);
-  const [loopKey, setLoopKey] = useState(0); // Forces re-mount of components on loop
+  const [loopKey, setLoopKey] = useState(0); 
 
-  // Orchestrate the 35-second looping presentation
   useEffect(() => {
     let timer: NodeJS.Timeout;
-    if (buildStep === 1) timer = setTimeout(() => setBuildStep(2), 10000); // Drawboard
-    else if (buildStep === 2) timer = setTimeout(() => setBuildStep(3), 7000);  // Coding
-    else if (buildStep === 3) timer = setTimeout(() => setBuildStep(4), 11000); // Debugging
+    if (buildStep === 1) timer = setTimeout(() => setBuildStep(2), 10000); 
+    else if (buildStep === 2) timer = setTimeout(() => setBuildStep(3), 7000);  
+    else if (buildStep === 3) timer = setTimeout(() => setBuildStep(4), 11000); 
     else if (buildStep === 4) timer = setTimeout(() => {
       setBuildStep(1);
-      setLoopKey(prev => prev + 1); // Reset animations for next loop
-    }, 7000); // Deploy
+      setLoopKey(prev => prev + 1); 
+    }, 7000); 
     return () => clearTimeout(timer);
   }, [buildStep]);
 
@@ -319,7 +298,8 @@ export default function NotebookPortfolio() {
         html { scroll-behavior: smooth; }
         
         /* New Advanced Animations */
-        @keyframes sketchMotion { from { transform: rotate(0deg); } to { transform: rotate(15deg); } }
+        @keyframes fadeInText { to { opacity: 1; } }
+        @keyframes dashMove { to { stroke-dashoffset: -20; opacity: 1; } }
         @keyframes glitchShake {
           0% { transform: translate(1px, 1px) rotate(0deg); filter: hue-rotate(90deg); }
           20% { transform: translate(-2px, 0px) rotate(-1deg); }
@@ -333,11 +313,11 @@ export default function NotebookPortfolio() {
         @keyframes rocketLaunch {
           0% { transform: translateY(0); }
           40% { transform: translateY(0); }
-          45% { transform: translateY(5px); } /* Rumble down */
-          50% { transform: translateY(-2px); } /* Rumble up */
+          45% { transform: translateY(5px); } 
+          50% { transform: translateY(-2px); } 
           55% { transform: translateY(5px); }
           60% { transform: translateY(-5px); }
-          100% { transform: translateY(-600px); } /* Blast off */
+          100% { transform: translateY(-600px); } 
         }
         @keyframes crtScanline {
           0% { transform: translateY(-100%); }
@@ -543,13 +523,13 @@ export default function NotebookPortfolio() {
               {/* Monitor Dashboard */}
               <div className="flex flex-col md:flex-row justify-between items-center mt-6 px-2 gap-4">
                 <div className="flex gap-2 md:gap-4 items-center">
-                   <div className={`px-2 md:px-3 py-1 rounded font-mono text-[10px] md:text-xs font-bold transition-colors ${buildStep === 1 ? 'bg-blue-600 text-white' : 'text-gray-500'}`}>1.PLAN</div>
+                   <div className={`px-2 md:px-3 py-1 rounded font-mono text-[10px] md:text-xs font-bold transition-colors ${buildStep === 1 ? 'bg-blue-600 text-white' : 'text-gray-500'}`}>1.ARCH</div>
                    <div className={`px-2 md:px-3 py-1 rounded font-mono text-[10px] md:text-xs font-bold transition-colors ${buildStep === 2 ? 'bg-blue-600 text-white' : 'text-gray-500'}`}>2.CODE</div>
-                   <div className={`px-2 md:px-3 py-1 rounded font-mono text-[10px] md:text-xs font-bold transition-colors ${buildStep === 3 ? 'bg-blue-600 text-white' : 'text-gray-500'}`}>3.DEBUG</div>
-                   <div className={`px-2 md:px-3 py-1 rounded font-mono text-[10px] md:text-xs font-bold transition-colors ${buildStep === 4 ? 'bg-emerald-600 text-white' : 'text-gray-500'}`}>4.SHIP</div>
+                   <div className={`px-2 md:px-3 py-1 rounded font-mono text-[10px] md:text-xs font-bold transition-colors ${buildStep === 3 ? 'bg-blue-600 text-white' : 'text-gray-500'}`}>3.CI/CD</div>
+                   <div className={`px-2 md:px-3 py-1 rounded font-mono text-[10px] md:text-xs font-bold transition-colors ${buildStep === 4 ? 'bg-emerald-600 text-white' : 'text-gray-500'}`}>4.DEPLOY</div>
                 </div>
                 <div className="flex gap-4 items-center">
-                  <div className="text-xs font-bold font-mono text-gray-400 hidden md:block">SYS_V.1.0</div>
+                  <div className="text-xs font-bold font-mono text-gray-400 hidden md:block">SYS_V.2.1</div>
                   <div className={`w-4 h-4 rounded-full border-2 border-black transition-colors ${buildStep === 3 ? 'bg-red-500 animate-none shadow-[0_0_10px_rgba(239,68,68,0.8)]' : 'bg-green-500 animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.8)]'}`}></div>
                 </div>
               </div>
