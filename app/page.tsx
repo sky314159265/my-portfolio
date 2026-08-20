@@ -39,39 +39,39 @@ const DrawboardStep = () => (
     <div className="relative w-full h-full flex items-center justify-center p-2 z-10">
       <svg className="w-full h-full md:w-[90%] md:h-[90%] text-slate-300" viewBox="0 0 400 250">
         
-        {/* Animated Data Streams (Dashed lines moving) */}
+        {/* Animated Data Streams */}
         <path className="animate-[dashMove_1s_linear_infinite]" style={{animationDelay: '3s', opacity: 0, animationFillMode: 'forwards'}} d="M 70 125 L 130 125" stroke="#3b82f6" strokeWidth="2" strokeDasharray="4 4" fill="none"/>
         <path className="animate-[dashMove_1s_linear_infinite]" style={{animationDelay: '4.5s', opacity: 0, animationFillMode: 'forwards'}} d="M 170 105 L 230 65" stroke="#10b981" strokeWidth="2" strokeDasharray="4 4" fill="none"/>
         <path className="animate-[dashMove_1s_linear_infinite]" style={{animationDelay: '5s', opacity: 0, animationFillMode: 'forwards'}} d="M 170 145 L 230 185" stroke="#ef4444" strokeWidth="2" strokeDasharray="4 4" fill="none"/>
         <path className="animate-[dashMove_1s_linear_infinite]" style={{animationDelay: '6.5s', opacity: 0, animationFillMode: 'forwards'}} d="M 270 185 L 330 125" stroke="#eab308" strokeWidth="2" strokeDasharray="4 4" fill="none"/>
 
-        {/* --- NODE 1: CLIENT --- */}
+        {/* NODE 1: CLIENT */}
         <rect className="live-draw" style={{animationDelay: '0.5s'}} pathLength="100" x="20" y="100" width="50" height="50" rx="8" stroke="currentColor" strokeWidth="3" fill="#1e293b"/>
         <text x="45" y="130" className="text-[10px] fill-white opacity-0" style={{animation: 'fadeInText 0.5s forwards 1s'}} textAnchor="middle">APP</text>
 
-        {/* --- CONNECTION 1 --- */}
+        {/* CONNECTION 1 */}
         <path className="live-draw" style={{animationDelay: '1.5s'}} pathLength="100" d="M 70 125 L 130 125" stroke="currentColor" strokeWidth="3" fill="none"/>
 
-        {/* --- NODE 2: API GATEWAY --- */}
+        {/* NODE 2: API GATEWAY */}
         <path className="live-draw" style={{animationDelay: '2s'}} pathLength="100" d="M 150 95 L 170 125 L 150 155 L 130 125 Z" stroke="#3b82f6" strokeWidth="3" fill="#1e293b"/>
         <text x="150" y="170" className="text-[8px] fill-blue-400 opacity-0" style={{animation: 'fadeInText 0.5s forwards 2.5s'}} textAnchor="middle">API_GATEWAY</text>
 
-        {/* --- CONNECTIONS OUT OF GATEWAY --- */}
+        {/* CONNECTIONS OUT OF GATEWAY */}
         <path className="live-draw" style={{animationDelay: '3s'}} pathLength="100" d="M 170 105 L 230 65" stroke="currentColor" strokeWidth="3" fill="none"/>
         <path className="live-draw" style={{animationDelay: '3.5s'}} pathLength="100" d="M 170 145 L 230 185" stroke="currentColor" strokeWidth="3" fill="none"/>
 
-        {/* --- NODE 3: AUTH SERVICE (TOP) --- */}
+        {/* NODE 3: AUTH SERVICE */}
         <rect className="live-draw" style={{animationDelay: '4s'}} pathLength="100" x="230" y="40" width="60" height="40" rx="4" stroke="#10b981" strokeWidth="3" fill="#1e293b"/>
         <text x="260" y="63" className="text-[10px] fill-emerald-400 opacity-0" style={{animation: 'fadeInText 0.5s forwards 4.5s'}} textAnchor="middle">AUTH</text>
 
-        {/* --- NODE 4: WEBSOCKETS (BOTTOM) --- */}
+        {/* NODE 4: WEBSOCKETS */}
         <rect className="live-draw" style={{animationDelay: '4.5s'}} pathLength="100" x="230" y="165" width="60" height="40" rx="4" stroke="#ef4444" strokeWidth="3" fill="#1e293b"/>
         <text x="260" y="188" className="text-[10px] fill-red-400 opacity-0" style={{animation: 'fadeInText 0.5s forwards 5s'}} textAnchor="middle">WSS_NODE</text>
 
-        {/* --- CONNECTION TO DB --- */}
+        {/* CONNECTION TO DB */}
         <path className="live-draw" style={{animationDelay: '5.5s'}} pathLength="100" d="M 290 185 L 330 125" stroke="currentColor" strokeWidth="3" fill="none"/>
 
-        {/* --- NODE 5: REDIS / DB (RIGHT) --- */}
+        {/* NODE 5: REDIS / DB */}
         <ellipse className="live-draw" style={{animationDelay: '6s'}} pathLength="100" cx="350" cy="95" rx="25" ry="10" stroke="#eab308" strokeWidth="3" fill="#1e293b"/>
         <path className="live-draw" style={{animationDelay: '6.5s'}} pathLength="100" d="M 325 95 L 325 145 A 25 10 0 0 0 375 145 L 375 95" stroke="#eab308" strokeWidth="3" fill="none"/>
         <text x="350" y="130" className="text-[10px] fill-yellow-400 opacity-0" style={{animation: 'fadeInText 0.5s forwards 7s'}} textAnchor="middle">REDIS</text>
@@ -82,9 +82,9 @@ const DrawboardStep = () => (
 );
 
 const CodingStep = () => {
-  const [codeLines, setCodeLines] = useState<JSX.Element[]>([]);
+  // BUG FIX: Changed JSX.Element[] to React.ReactNode[]
+  const [codeLines, setCodeLines] = useState<React.ReactNode[]>([]);
   
-  // Real code chunks parsed with faux syntax highlighting
   const rawCode = [
     { text: "import", color: "text-purple-400" }, { text: " { WebSocketServer } ", color: "text-gray-300" }, { text: "from", color: "text-purple-400" }, { text: " 'ws';\n\n", color: "text-green-300" },
     { text: "const", color: "text-purple-400" }, { text: " wss ", color: "text-blue-300" }, { text: "= new", color: "text-purple-400" }, { text: " WebSocketServer({ port: ", color: "text-gray-300" }, { text: "8080", color: "text-orange-400" }, { text: " });\n\n", color: "text-gray-300" },
@@ -100,10 +100,10 @@ const CodingStep = () => {
   ];
 
   useEffect(() => {
-    let currentLines: JSX.Element[] = [];
+    // BUG FIX: Changed JSX.Element[] to React.ReactNode[]
+    let currentLines: React.ReactNode[] = [];
     let chunkIndex = 0;
     
-    // Varying speeds simulates real human typing bursts
     const typeChunk = () => {
       if (chunkIndex >= rawCode.length) return;
       const chunk = rawCode[chunkIndex];
@@ -112,7 +112,7 @@ const CodingStep = () => {
       setCodeLines([...currentLines]);
       
       chunkIndex++;
-      const nextDelay = Math.random() * 120 + 30; // Random delay 30-150ms
+      const nextDelay = Math.random() * 120 + 30; 
       setTimeout(typeChunk, nextDelay);
     };
     
@@ -140,7 +140,8 @@ const CodingStep = () => {
 };
 
 const DebugStep = () => {
-  const [logs, setLogs] = useState<JSX.Element[]>([]);
+  // BUG FIX: Changed JSX.Element[] to React.ReactNode[]
+  const [logs, setLogs] = useState<React.ReactNode[]>([]);
   const [isGlitching, setIsGlitching] = useState(false);
 
   useEffect(() => {
@@ -150,7 +151,7 @@ const DebugStep = () => {
       { t: 2500, elem: <span className="text-gray-500">... GitHub Actions CI/CD Triggered ...</span> },
       { t: 3500, elem: <span className="text-gray-500">... Running integration tests (142/142) ...</span> },
       { t: 4500, elem: <span className="text-red-500 font-bold bg-red-950/50 p-1 w-full block">✖ FATAL: Race condition detected in WS stream. Process exited with code 1.</span> },
-      { t: 4700, action: () => setIsGlitching(true) }, // Trigger screen shake
+      { t: 4700, action: () => setIsGlitching(true) }, 
       { t: 5500, action: () => setIsGlitching(false) },
       { t: 6000, elem: <span><span className="text-emerald-400">~/app</span> ➜ git checkout -b hotfix/ws-race</span> },
       { t: 7500, elem: <span><span className="text-emerald-400">~/app</span> ➜ git commit -am "hotfix: implement mutex lock"</span> },
@@ -189,18 +190,11 @@ const DeployStep = () => (
     
     <svg className="w-full h-full text-white z-10" viewBox="0 0 200 200">
       <g style={{ animation: 'rocketLaunch 7s ease-in forwards' }}>
-        {/* Rocket Body */}
         <path className="live-draw" style={{animationDuration: '2s'}} pathLength="100" d="M 100 40 C 120 70 120 120 120 140 L 80 140 C 80 120 80 70 100 40 Z" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-        {/* Fins */}
         <path className="live-draw" style={{animationDelay: '1s', animationDuration: '1s'}} pathLength="100" d="M 80 120 L 50 150 L 80 140 M 120 120 L 150 150 L 120 140" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-        {/* Window */}
         <circle className="live-draw" style={{animationDelay: '1.5s', animationDuration: '0.5s'}} pathLength="100" cx="100" cy="90" r="12" stroke="currentColor" strokeWidth="4" fill="none"/>
-        
-        {/* Fire Flames */}
         <path className="live-draw text-orange-500 origin-top animate-[flameFlicker_0.1s_infinite]" style={{animationDelay: '2.5s', animationDuration: '0.5s'}} pathLength="100" d="M 85 140 L 85 170 L 100 190 L 115 170 L 115 140" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
       </g>
-      
-      {/* Smoke Clouds */}
       <path className="opacity-0 text-gray-500 animate-[fadeInOut_4s_ease-in-out_3.5s_forwards]" d="M 70 180 Q 50 160 30 190 Q 60 210 90 190" stroke="currentColor" strokeWidth="6" strokeLinecap="round" fill="none"/>
       <path className="opacity-0 text-gray-500 animate-[fadeInOut_4s_ease-in-out_3.8s_forwards]" d="M 130 180 Q 150 160 170 190 Q 140 210 110 190" stroke="currentColor" strokeWidth="6" strokeLinecap="round" fill="none"/>
     </svg>
@@ -212,7 +206,6 @@ const DeployStep = () => (
 // ==========================================
 
 export default function NotebookPortfolio() {
-  // --- BUILD PIPELINE STATE ---
   const [buildStep, setBuildStep] = useState(1);
   const [loopKey, setLoopKey] = useState(0); 
 
@@ -228,7 +221,6 @@ export default function NotebookPortfolio() {
     return () => clearTimeout(timer);
   }, [buildStep]);
 
-  // --- TIC-TAC-TOE AI STATE ---
   const [board, setBoard] = useState(Array(9).fill(null));
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
   const [winningLine, setWinningLine] = useState<string | null>(null);
@@ -297,7 +289,6 @@ export default function NotebookPortfolio() {
         @keyframes drawPath { to { stroke-dashoffset: 0; } }
         html { scroll-behavior: smooth; }
         
-        /* New Advanced Animations */
         @keyframes fadeInText { to { opacity: 1; } }
         @keyframes dashMove { to { stroke-dashoffset: -20; opacity: 1; } }
         @keyframes glitchShake {
