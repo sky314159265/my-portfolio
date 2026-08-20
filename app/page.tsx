@@ -235,7 +235,11 @@ export default function NotebookPortfolio() {
             <div className="relative bg-white p-4 pb-12 border border-gray-200 shadow-[8px_8px_0_0_rgba(0,0,0,0.8)] transform rotate-1 transition-transform hover:-rotate-1">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-yellow-200/80 transform -rotate-2 border border-yellow-300"></div>
               <div className="aspect-video bg-gray-900 rounded-sm mb-4 flex items-center justify-center text-white border-2 border-black">
-                <span className="font-mono text-xs md:text-sm opacity-50">CNOIZE_TRADING_ENGINE_UI</span>
+                <img
+                   src="/cnoize.png"
+                   alt="cnoize Tarding app Interface"
+                   clasname="w-full h-full object=cover"
+                   />
               </div>
               <h3 className="text-3xl font-bold mb-2">Cnoize Trading App</h3>
               <p className="text-xl text-gray-700 leading-tight">Kotlin/Jetpack Compose UI powered by real-time WebSockets and Upstash Redis.</p>
@@ -319,7 +323,7 @@ export default function NotebookPortfolio() {
           <p className="text-2xl text-gray-600 mb-8 max-w-xl">
             Currently taking on new projects. If you need robust architecture and zero bloat, drop me a line.
           </p>
-          <a href="mailto:your.email@gmail.com" className="relative group inline-block cursor-pointer">
+          <a href="mailto:theskylensteam@gmail.com" className="relative group inline-block cursor-pointer">
             <div className="absolute inset-0 bg-black transform rotate-2 group-hover:rotate-0 transition-transform"></div>
             <div className="relative bg-white border-2 border-black px-8 py-3 text-3xl font-bold transform -rotate-1 group-hover:rotate-0 transition-transform flex items-center gap-3">
               <svg className="w-6 h-6" viewBox="0 0 100 100">
